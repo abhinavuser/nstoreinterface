@@ -26,9 +26,9 @@ export default {
     return {
       navbarOptions: [
         "Home",
-        "About",
+        "Order",
         { title: "Services", open: false, subOptions: ["Service 1", "Service 2", "Service 3"] },
-        { title: "Order", open: false, subOptions: ["Order1", "Order2"] }
+        { title: "Partners", open: false, subOptions: ["Partner1", "Partner2", "Partner3"] }
       ],
       selectedOption: null
     };
@@ -45,14 +45,32 @@ export default {
 </script>
 
 <style scoped>
+nav {
+  background-color: #333;
+  padding: 10px 20px; /* Add padding to the nav */
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .nav-item {
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 20px;
 }
 
 .nav-link {
-  color: #000;
+  color: #fff;
   text-decoration: none;
+  padding: 10px 15px;
+  transition: background-color 0.3s ease; /* Add smooth transition */
+}
+
+.nav-link:hover {
+  background-color: #555;
+  cursor: pointer;
 }
 
 .dropdown {
@@ -63,10 +81,15 @@ export default {
 .dropbtn {
   background-color: #3498db;
   color: white;
-  padding: 10px;
+  padding: 10px 15px;
   font-size: 16px;
   border: none;
   cursor: pointer;
+  transition: background-color 0.3s ease; /* Add smooth transition */
+}
+
+.dropbtn:hover {
+  background-color: #2980b9;
 }
 
 .dropdown-content {
@@ -80,9 +103,10 @@ export default {
 
 .dropdown-content a {
   display: block;
-  padding: 12px 16px;
+  padding: 10px 15px;
   color: black;
   text-decoration: none;
+  transition: background-color 0.3s ease; /* Add smooth transition */
 }
 
 .dropdown-content a:hover {
