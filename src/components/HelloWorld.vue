@@ -7,7 +7,7 @@
           <div v-else class="dropdown">
             <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
             <div v-show="option.open" class="dropdown-content">
-              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="handleOptionClick(subOption)" class="nav-link">{{ subOption }}</a>
+              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="handleDropdownItemClick(option, subOption)" class="nav-link">{{ subOption }}</a>
             </div>
           </div>
         </li>
@@ -49,12 +49,14 @@ export default {
       if (option.title === "Order") {
         this.selectedOption = "Order"; // Set selectedOption to "Order" when "Order" is clicked
       }
+    },
+    handleDropdownItemClick(option, subOption) {
+      this.selectedOption = subOption;
+      option.open = false; // Hide the dropdown after clicking a dropdown item
     }
   }
 };
 </script>
-
-
 
 <style scoped>
 nav {
@@ -129,3 +131,4 @@ ul {
   display: block;
 }
 </style>
+
