@@ -15,13 +15,20 @@
     </nav>
     <div v-if="selectedOption">
       <h1>{{ selectedOption }} Page</h1>
-      <!-- Your order page content here -->
+      <div v-if="selectedOption === 'Order'">
+        <OrderPage />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import OrderPage from '@/views/OrderPage.vue';
+
 export default {
+  components: {
+    OrderPage
+  },
   data() {
     return {
       navbarOptions: [
@@ -30,7 +37,7 @@ export default {
         { title: "Services", open: false, subOptions: ["Service 1", "Service 2", "Service 3"] },
         { title: "Partners", open: false, subOptions: ["Partner1", "Partner2", "Partner3"] }
       ],
-      selectedOption: null
+      selectedOption: null,
     };
   },
   methods: {
@@ -39,15 +46,20 @@ export default {
     },
     toggleDropdown(option) {
       option.open = !option.open;
+      if (option.title === "Order") {
+        this.selectedOption = "Order"; // Set selectedOption to "Order" when "Order" is clicked
+      }
     }
   }
 };
 </script>
 
+
+
 <style scoped>
 nav {
   background-color: #333;
-  padding: 10px 20px; /* Add padding to the nav */
+  padding: 10px 20px;
 }
 
 ul {
@@ -65,7 +77,7 @@ ul {
   color: #fff;
   text-decoration: none;
   padding: 10px 15px;
-  transition: background-color 0.3s ease; /* Add smooth transition */
+  transition: background-color 0.3s ease;
 }
 
 .nav-link:hover {
@@ -85,7 +97,7 @@ ul {
   font-size: 16px;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease; /* Add smooth transition */
+  transition: background-color 0.3s ease;
 }
 
 .dropbtn:hover {
@@ -106,7 +118,7 @@ ul {
   padding: 10px 15px;
   color: black;
   text-decoration: none;
-  transition: background-color 0.3s ease; /* Add smooth transition */
+  transition: background-color 0.3s ease;
 }
 
 .dropdown-content a:hover {

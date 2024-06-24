@@ -1,14 +1,22 @@
 <template>
   <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div v-if="showOrderPage">
+      <OrderPage />
+      <ViewOrderPage />
+    </div>
 </template>
 
 <script>
 import HelloWorld from './components/HelloWorld.vue'
+import OrderPage from '@/views/OrderPage.vue';
+import ViewOrderPage from '@/views/ViewOrderPage.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    HelloWorld,
+    OrderPage,
+    ViewOrderPage
   }
 }
 </script>
