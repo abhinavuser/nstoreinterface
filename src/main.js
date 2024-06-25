@@ -4,6 +4,7 @@ import App from './App.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import OrderPage from '@/views/OrderPage.vue'
 import ViewOrderPage from '@/views/ViewOrderPage.vue' // Import ViewOrderPage
+import '@fortawesome/fontawesome-free/css/all.css'
 
 const router = createRouter({
   history: createWebHistory(),

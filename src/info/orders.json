@@ -1,0 +1,5 @@
+[
+    { "id": 1, "customer": "John Doe", "amount": 120 },
+    { "id": 2, "customer": "Jane Smith", "amount": 150 }
+  ]
+  
