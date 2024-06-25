@@ -1,28 +1,16 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import OrderPage from '@/views/OrderPage.vue'
-import ViewOrderPage from '@/views/ViewOrderPage.vue'
-
-Vue.use(VueRouter)
+import { createRouter, createWebHistory } from 'vue-router';
+import OrderPage from '@/views/OrderPage.vue';
+import ViewOrderPage from '@/views/ViewOrderPage.vue';
 
 const routes = [
-  {
-    path: '/',
-    name: 'order-page',
-    component: OrderPage
-  },
-  {
-    path: '/order/:id',
-    name: 'view-order',
-    component: ViewOrderPage,
-    props: true
-  }
-]
+  { path: '/', redirect: '/order' },
+  { path: '/order', component: OrderPage },
+  { path: '/order/:orderId', component: ViewOrderPage, name: 'ViewOrderPage' } // Ensure the name property is set
+];
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(),
   routes
-})
+});
 
-export default router
+export default router;

@@ -3,11 +3,18 @@
     <nav>
       <ul>
         <li v-for="(option, index) in navbarOptions" :key="index" class="nav-item">
-          <a v-if="typeof option === 'string'" @click="handleOptionClick(option)" class="nav-link">{{ option }}</a>
+          <a v-if="typeof option === 'string'" @click="selectOption(option)" class="nav-link">{{ option }}</a>
           <div v-else class="dropdown">
             <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
             <div v-show="option.open" class="dropdown-content">
-              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="handleDropdownItemClick(option, subOption)" class="nav-link">{{ subOption }}</a>
+              <form @submit.prevent="addService">
+                <input v-model="newService" placeholder="Enter new service" />
+                <button type="submit">Add Service</button>
+              </form>
+              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
+                {{ subOption }}
+                <button @click.stop="deleteService(subIndex)" class="delete-btn">Delete</button>
+              </a>
             </div>
           </div>
         </li>
@@ -15,44 +22,113 @@
     </nav>
     <div v-if="selectedOption">
       <h1>{{ selectedOption }} Page</h1>
-      <div v-if="selectedOption === 'Order'">
-        <OrderPage />
-      </div>
+      <component :is="getComponentForOption(selectedOption)"></component>
     </div>
   </div>
 </template>
 
 <script>
 import OrderPage from '@/views/OrderPage.vue';
+import Service1Page from '@/views/Service1Page.vue';
+import Service2Page from '@/views/Service2Page.vue';
+import Service3Page from '@/views/Service3Page.vue';
+import Partner1Page from '@/views/Partner1Page.vue';
+import Partner2Page from '@/views/Partner2Page.vue';
+import Partner3Page from '@/views/Partner3Page.vue';
 
 export default {
   components: {
-    OrderPage
+    OrderPage,
+    Service1Page,
+    Service2Page,
+    Service3Page,
+    Partner1Page,
+    Partner2Page,
+    Partner3Page,
   },
   data() {
     return {
+      newService: '',
       navbarOptions: [
         "Home",
         "Order",
-        { title: "Services", open: false, subOptions: ["Service 1", "Service 2", "Service 3"] },
-        { title: "Partners", open: false, subOptions: ["Partner1", "Partner2", "Partner3"] }
+        { title: "Service", open: false, subOptions: ["Service 1", "Service 2", "Service 3"] },
+        { title: "Partners", open: false, subOptions: ["Partner 1", "Partner 2", "Partner 3"] }
       ],
       selectedOption: null,
     };
   },
+  created() {
+    this.loadServices();
+  },
   methods: {
-    handleOptionClick(option) {
+    loadServices() {
+      const savedServices = localStorage.getItem('services');
+      if (savedServices) {
+        const serviceDropdown = this.navbarOptions.find(option => option.title === 'Service');
+        if (serviceDropdown) {
+          serviceDropdown.subOptions = JSON.parse(savedServices);
+        }
+      }
+    },
+    saveServices() {
+      const serviceDropdown = this.navbarOptions.find(option => option.title === 'Service');
+      if (serviceDropdown) {
+        localStorage.setItem('services', JSON.stringify(serviceDropdown.subOptions));
+      }
+    },
+    selectOption(option) {
       this.selectedOption = option;
+      this.closeAllDropdowns();
     },
     toggleDropdown(option) {
       option.open = !option.open;
-      if (option.title === "Order") {
-        this.selectedOption = "Order"; // Set selectedOption to "Order" when "Order" is clicked
+    },
+    selectDropdownOption(subOption) {
+      this.selectedOption = subOption;
+      this.closeAllDropdowns();
+    },
+    closeAllDropdowns() {
+      this.navbarOptions.forEach(option => {
+        if (typeof option === 'object') {
+          option.open = false;
+        }
+      });
+    },
+    getComponentForOption(option) {
+      switch (option) {
+        case "Order":
+          return "OrderPage";
+        case "Service 1":
+          return "Service1Page";
+        case "Service 2":
+          return "Service2Page";
+        case "Service 3":
+          return "Service3Page";
+        case "Partner 1":
+          return "Partner1Page";
+        case "Partner 2":
+          return "Partner2Page";
+        case "Partner 3":
+          return "Partner3Page";
+        default:
+          return null;
       }
     },
-    handleDropdownItemClick(option, subOption) {
-      this.selectedOption = subOption;
-      option.open = false; // Hide the dropdown after clicking a dropdown item
+    addService() {
+      const serviceDropdown = this.navbarOptions.find(option => option.title === 'Service');
+      if (serviceDropdown && this.newService.trim() !== '') {
+        serviceDropdown.subOptions.push(this.newService.trim());
+        this.saveServices();
+        this.newService = '';
+      }
+    },
+    deleteService(index) {
+      const serviceDropdown = this.navbarOptions.find(option => option.title === 'Service');
+      if (serviceDropdown) {
+        serviceDropdown.subOptions.splice(index, 1);
+        this.saveServices();
+      }
     }
   }
 };
@@ -79,7 +155,7 @@ ul {
   color: #fff;
   text-decoration: none;
   padding: 10px 15px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .nav-link:hover {
@@ -110,24 +186,73 @@ ul {
   display: none;
   position: absolute;
   background-color: #f9f9f9;
-  min-width: 160px;
+  min-width: 200px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
+  padding: 10px;
 }
 
-.dropdown-content a {
-  display: block;
+.dropdown-content .nav-link {
+  display: flex;
+  justify-content: space-between;
   padding: 10px 15px;
   color: black;
   text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-content .nav-link:hover {
+  background-color: #ddd;
+  cursor: pointer;
+}
+
+.dropdown-content form {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.dropdown-content input {
+  flex: 1;
+  padding: 8px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.dropdown-content button {
+  padding: 8px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.dropdown-content a:hover {
-  background-color: #ddd;
+.dropdown-content button:hover {
+  background-color: #2980b9;
 }
 
-.dropdown:hover .dropdown-content {
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+.dropdown-content {
+  display: none;
+}
+
+.dropdown .dropbtn:focus + .dropdown-content,
+.dropdown-content:hover {
   display: block;
 }
 </style>
