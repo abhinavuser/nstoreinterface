@@ -54,11 +54,14 @@ export default {
 }
 
 .view-order-btn {
+  border: none;
   background-color: #3498db;
   color: white;
+  padding: 10px 15px;
+  font-size: 16px;
   border: none;
-  padding: 5px 10px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .order-details {
