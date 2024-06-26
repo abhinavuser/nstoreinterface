@@ -1,17 +1,18 @@
 <template>
   <div class="view-order-page">
-    <h2>View Order</h2>
+    <h2>Order Details</h2>
     <div class="order-container">
       <div v-if="selectedOrder" class="order-details">
         <p><strong>Order ID:</strong> {{ selectedOrder.id }}</p>
         <p><strong>Customer:</strong> {{ selectedOrder.customer }}</p>
-        <p><strong>Amount:</strong> {{ selectedOrder.amount }}</p>
+        <p><strong>Amount:</strong> ₹{{ selectedOrder.amount }}</p>
+        <p v-if="selectedOrder.phone"><strong>Phone Number:</strong> {{ selectedOrder.phone }}</p>
         <!-- Display additional order details here -->
       </div>
       <div class="tracking-details">
         <h3>Tracking Details</h3>
         <ul>
-          <li v-for="(status, index) in trackingDetails" :key="index">
+          <li v-for="(status, index) in trackingDetails" :key="index" :class="{ completed: status.completed }">
             <i :class="['fa', status.completed ? 'fa-check-circle' : 'fa-circle', 'status-icon']"></i>
             {{ status.text }}
           </li>
@@ -59,18 +60,20 @@ export default {
   margin: 20px auto;
   padding: 20px;
   border-radius: 8px;
-  background-color: #f8f9fa;
+  background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial';
 }
 
 .order-container {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
 }
 
 .order-details, .tracking-details {
   flex: 1;
-  margin: 0 10px;
+  margin: 0 20px;
 }
 
 .order-details p, .tracking-details ul {
@@ -78,9 +81,15 @@ export default {
   font-size: 16px;
 }
 
+.order-details p {
+  line-height: 1.5;
+}
+
 .tracking-details h3 {
   margin-bottom: 10px;
   text-align: center;
+  font-size: 18px;
+  color: green
 }
 
 .tracking-details ul {
@@ -95,10 +104,16 @@ export default {
   padding: 10px;
   margin-bottom: 5px;
   border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.tracking-details ul li.completed {
+  background-color: #d4edda;
 }
 
 .status-icon {
   margin-right: 10px;
+  font-size: 20px;
 }
 
 .status-icon.fa-check-circle {
@@ -129,5 +144,7 @@ export default {
 h2 {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 24px;
+  color: #343a40;
 }
 </style>
