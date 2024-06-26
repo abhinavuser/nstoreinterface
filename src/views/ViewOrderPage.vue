@@ -37,10 +37,12 @@ export default {
       orders: [],
       selectedOrder: null,
       trackingDetails: [
-        { text: 'Started towards pick up location', completed: true },
-        { text: 'Reached pick up location', completed: false },
-        { text: 'Picked up order', completed: false },
-        { text: 'Started towards drop off', completed: false }
+        { text: 'Created', completed: true },
+        { text: 'Assigned', completed: true },
+        { text: 'Arrived at pickup', completed: false },
+        { text: 'Picked up', completed: false },
+        { text: 'Arrived', completed: false },
+        { text: 'Delivered', completed: false }
       ]
     };
   },

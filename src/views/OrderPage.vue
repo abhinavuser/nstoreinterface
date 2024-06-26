@@ -2,12 +2,26 @@
   <div>
     <div v-if="!showOrderDetailsPage">
       <h2>Orders</h2>
-      <ul class="order-list">
-        <li v-for="(order, index) in orders" :key="index" class="order-item">
-          <span class="order-info">Order ID: {{ order.id }} - Customer: {{ order.customer }} - Amount: {{ order.amount }}</span>
-          <button @click="showOrderDetails(order.id)" class="view-order-btn">View Order</button>
-        </li>
-      </ul>
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(order, index) in orders" :key="index">
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer }}</td>
+            <td>{{ order.amount }}</td>
+            <td>
+              <button @click="showOrderDetails(order.id)" class="view-order-btn">View Order</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div v-else>
       <ViewOrderPage :orderId="selectedOrderId" @close="showOrderDetailsPage = false" />
@@ -43,45 +57,66 @@ export default {
 </script>
 
 <style scoped>
-.order-list {
-  list-style: none;
-  padding: 0;
-  max-width: 600px;
+.order-table {
+  width: 100%;
+  max-width: 800px;
   margin: 0 auto;
-}
-
-.order-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  margin-bottom: 10px;
+  border-collapse: separate;
+  border-spacing: 0;
   border-radius: 8px;
-  background-color: #f8f9fa;
+  overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
 }
 
-.order-info {
+.order-table thead {
+  background-color: #007bff;
+  color: white;
+}
+
+.order-table th,
+.order-table td {
+  padding: 15px 20px;
+  text-align: left;
+}
+
+.order-table th {
   font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.order-table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.order-table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+.order-table td {
+  border-bottom: 1px solid #dee2e6;
 }
 
 .view-order-btn {
   border: none;
-  background-color: #007bff;
+  background-color: #28a745;
   color: white;
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 8px 15px;
+  font-size: 14px;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .view-order-btn:hover {
-  background-color: #0056b3;
+  background-color: #218838;
 }
 
 h2 {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 24px;
+  color: #343a40;
 }
 </style>
