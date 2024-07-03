@@ -1,32 +1,37 @@
 <template>
-  <div>
-    <nav>
-      <ul>
-        <li v-for="(option, index) in navbarOptions" :key="index" class="nav-item">
-          <a v-if="typeof option === 'string'" @click="selectOption(option)" class="nav-link">{{ option }}</a>
-          <div v-else class="dropdown">
-            <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
-            <div v-show="option.open" class="dropdown-content">
-              <form @submit.prevent="option.title === 'Service' ? addService(option) : addPartner(option)">
-                <input v-model="newEntry" :placeholder="'Enter new ' + option.title.toLowerCase()" />
-                <button type="submit">{{ option.title === 'Service' ? 'Add Service' : 'Add Partner' }}</button>
-              </form>
-              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
-                {{ subOption }}
-                <button @click.stop="option.title === 'Service' ? deleteService(subIndex) : deletePartner(subIndex)" class="delete-btn">
-                  {{ option.title === 'Service' ? 'Delete Service' : 'Delete Partner' }}
-                </button>
-              </a>
+  <body>
+    <div>
+      <nav>
+        <ul>
+          <li v-for="(option, index) in navbarOptions" :key="index" class="nav-item">
+            <a v-if="typeof option === 'string'" @click="selectOption(option)" class="nav-link">{{ option }}</a>
+            <div v-else class="dropdown">
+              <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
+              <div v-show="option.open" class="dropdown-content">
+                <form @submit.prevent="option.title === 'Service' ? addService(option) : addPartner(option)">
+                  <input v-model="newEntry" :placeholder="'Enter new ' + option.title.toLowerCase()" />
+                  <button type="submit">{{ option.title === 'Service' ? 'Add Service' : 'Add Partner' }}</button>
+                </form>
+                <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
+                  {{ subOption }}
+                  <button @click.stop="option.title === 'Service' ? deleteService(subIndex) : deletePartner(subIndex)" class="delete-btn">
+                    {{ option.title === 'Service' ? 'Delete Service' : 'Delete Partner' }}
+                  </button>
+                </a>
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
-    </nav>
-    <div v-if="selectedOption">
-      <h1>{{ selectedOption }} Page</h1>
-      <component :is="getComponentForOption(selectedOption)"></component>
+          </li>
+        </ul>
+      </nav>
+      <div v-if="selectedOption && selectedOption !== 'Home'">
+        <h1>{{ selectedOption }} Page</h1>
+        <component :is="getComponentForOption(selectedOption)"></component>
+      </div>
+      <div v-else>
+        <component :is="getComponentForOption(selectedOption)"></component>
+      </div>
     </div>
-  </div>
+  </body>
 </template>
 
 <script>
@@ -38,6 +43,7 @@ import Partner1Page from '@/views/Partner1Page.vue';
 import Partner2Page from '@/views/Partner2Page.vue';
 import Partner3Page from '@/views/Partner3Page.vue';
 import ViewOrderPage from '@/views/ViewOrderPage.vue';
+import MainPage from '@/views/MainPage.vue';
 
 export default {
   components: {
@@ -49,6 +55,7 @@ export default {
     Partner1Page,
     Partner2Page,
     Partner3Page,
+    MainPage,
   },
   data() {
     return {
@@ -127,6 +134,8 @@ export default {
     },
     getComponentForOption(option) {
       switch (option) {
+        case "Home":
+          return "MainPage"
         case "Order":
           return "OrderPage";
         case "View Order":

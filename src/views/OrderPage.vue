@@ -70,7 +70,7 @@ export default {
 }
 
 .order-table thead {
-  background-color: #007bff;
+  background-color: #3498db;
   color: white;
 }
 

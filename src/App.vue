@@ -1,24 +1,24 @@
 <template>
   <div id="app">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <HomePage />
     <div v-if="showOrderPage">
       <OrderPage />
-      <ViewOrderPage /> <!-- Include ViewOrderPage component here -->
+      <ViewOrderPage />
     </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import HomePage from './components/HomePage.vue'
 import OrderPage from '@/views/OrderPage.vue';
-import ViewOrderPage from '@/views/ViewOrderPage.vue'; // Import ViewOrderPage
+import ViewOrderPage from '@/views/ViewOrderPage.vue'; 
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
+    HomePage,
     OrderPage,
-    ViewOrderPage // Include ViewOrderPage in components
+    ViewOrderPage 
   }
 }
 </script>
