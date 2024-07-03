@@ -1,7 +1,14 @@
-[
-    { "id": 1, "customer": "John Doe", "amount": 120 },
-    { "id": 2, "customer": "Jane Smith", "amount": 150 },
-    { "id": 3, "customer": "Jacob", "amount": 250},
-    {"id": 4674, "customer": "Prajan", "amount": 8958.65748 , "Phone Number": 9876543210}
+{
+  "items": [
+    {
+      "id": 1,
+      "customer": "Rick Sanchez",
+      "amount": "Human"
+    },
+    {
+      "id": 183,
+      "customer": "Johnny Depp",
+      "amount": "Human"
+    }
   ]
-  
+}
