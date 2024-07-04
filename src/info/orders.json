@@ -1,9 +1,8 @@
 [
-<<<<<<< HEAD
   {
     "id": 99,
     "customer": "Hepatitis C",
-    "service": "unknown",
+    "service": "unknn",
     "amount": "Disease",
     "status": ""
   },
@@ -13,21 +12,19 @@
     "service": "unknown",
     "amount": "Alien",
     "status": "Larva alien"
-  }
-=======
-    {
+  },
+  {
       "id": 1,
       "customer": "Rick Sanchez",
       "service": "Service 1",
       "amount": "Human",
       "status":"Completed"
-    },
-    {
+  },
+  {
       "id": 183,
       "customer": "Johnny Depp",
       "service": "Service 2",
       "amount": "Human",
       "status": "Pending"
     }
->>>>>>> 7138620c929f4db71be0821d74f7a76ce21508a6
 ]
