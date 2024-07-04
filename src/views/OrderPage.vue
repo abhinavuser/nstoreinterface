@@ -10,6 +10,7 @@
             <th>Service</th>
             <th>Amount</th>
             <th>Action</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -21,6 +22,7 @@
             <td>
               <button @click="showOrderDetails(order.id)" class="view-order-btn">View Order</button>
             </td>
+            <td>{{ order.status }}</td>
           </tr>
         </tbody>
       </table>

@@ -3,12 +3,14 @@
       "id": 1,
       "customer": "Rick Sanchez",
       "service": "Service 1",
-      "amount": "Human"
+      "amount": "Human",
+      "status":"Completed"
     },
     {
       "id": 183,
       "customer": "Johnny Depp",
       "service": "Service 2",
-      "amount": "Human"
+      "amount": "Human",
+      "status": "Pending"
     }
 ]
