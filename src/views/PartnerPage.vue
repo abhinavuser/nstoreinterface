@@ -4,7 +4,7 @@
     <div class="partner-details">
       <h3>Partner Details</h3>
       <div class="details-item">
-        <label>Partner Name:</label>
+        <label>Logistics Name:</label>
         <span>{{ partnerName }}</span>
       </div>
       <div class="details-item">

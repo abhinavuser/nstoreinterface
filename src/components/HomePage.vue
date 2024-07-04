@@ -1,37 +1,35 @@
 <template>
-  <body>
-    <div>
-      <nav>
-        <ul>
-          <li v-for="(option, index) in navbarOptions" :key="index" class="nav-item">
-            <a v-if="typeof option === 'string'" @click="selectOption(option)" class="nav-link">{{ option }}</a>
-            <div v-else class="dropdown">
-              <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
-              <div v-show="option.open" class="dropdown-content">
-                <form @submit.prevent="option.title === 'Service' ? addService(option) : addPartner(option)">
-                  <input v-model="newEntry" :placeholder="'Enter new ' + option.title.toLowerCase()" />
-                  <button type="submit">{{ option.title === 'Service' ? 'Add Service' : 'Add Partner' }}</button>
-                </form>
-                <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
-                  {{ subOption }}
-                  <button @click.stop="option.title === 'Service' ? deleteService(subIndex) : deletePartner(subIndex)" class="delete-btn">
-                    {{ option.title === 'Service' ? 'Delete Service' : 'Delete Partner' }}
-                  </button>
-                </a>
-              </div>
+  <div>
+    <nav>
+      <ul>
+        <li v-for="(option, index) in navbarOptions" :key="index" class="nav-item">
+          <a v-if="typeof option === 'string'" @click="selectOption(option)" class="nav-link">{{ option }}</a>
+          <div v-else class="dropdown">
+            <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
+            <div v-show="option.open" class="dropdown-content">
+              <form @submit.prevent="option.title === 'Store' ? addService() : addPartner()">
+                <input v-model="newEntry" :placeholder="'Enter new ' + option.title.toLowerCase()" />
+                <button type="submit">{{ option.title === 'Store' ? 'Add Store' : 'Add Logistics' }}</button>
+              </form>
+              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
+                {{ subOption }}
+                <button @click.stop="option.title === 'Store' ? deleteService(subIndex) : deletePartner(subIndex)" class="delete-btn">
+                  {{ option.title === 'Store' ? 'Delete Store' : 'Delete Logistics' }}
+                </button>
+              </a>
             </div>
-          </li>
-        </ul>
-      </nav>
-      <div v-if="selectedOption && selectedOption !== 'Home'">
-        <h1>{{ selectedOption }} Page</h1>
-        <component :is="getComponentForOption(selectedOption)"></component>
-      </div>
-      <div v-else>
-        <component :is="getComponentForOption(selectedOption)"></component>
-      </div>
+          </div>
+        </li>
+      </ul>
+    </nav>
+    <div v-if="selectedOption && selectedOption !== 'Home'">
+      <h1>{{ selectedOption }} Page</h1>
+      <component :is="getComponentForOption(selectedOption)"></component>
     </div>
-  </body>
+    <div v-else>
+      <component :is="getComponentForOption(selectedOption)"></component>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -52,57 +50,25 @@ export default {
   data() {
     return {
       newEntry: '',
+      services: [],
+      partners: [],
       navbarOptions: [
         "Home",
         "Order",
-        { title: "Service", open: false, subOptions: ["Service 1", "Service 2", "Service 3"] },
-        { title: "Partners", open: false, subOptions: ["Partner 1", "Partner 2", "Partner 3"] }
+        { title: "Store", open: false, subOptions: [] },
+        { title: "Logistics", open: false, subOptions: [] }
       ],
       selectedOption: null,
     };
   },
-  created() {
-    this.loadEntries();
-  },
   methods: {
-    loadEntries() {
-      const savedServices = localStorage.getItem('services');
-      if (savedServices) {
-        const serviceDropdown = this.navbarOptions.find(option => option.title === 'Service');
-        if (serviceDropdown) {
-          serviceDropdown.subOptions = JSON.parse(savedServices);
-        }
-      }
-
-      const savedPartners = localStorage.getItem('partners');
-      if (savedPartners) {
-        const partnerDropdown = this.navbarOptions.find(option => option.title === 'Partners');
-        if (partnerDropdown) {
-          partnerDropdown.subOptions = JSON.parse(savedPartners);
-        }
-      }
-    },
-    saveEntries() {
-      const serviceDropdown = this.navbarOptions.find(option => option.title === 'Service');
-      if (serviceDropdown) {
-        localStorage.setItem('services', JSON.stringify(serviceDropdown.subOptions));
-      }
-
-      const partnerDropdown = this.navbarOptions.find(option => option.title === 'Partners');
-      if (partnerDropdown) {
-        localStorage.setItem('partners', JSON.stringify(partnerDropdown.subOptions));
-      }
-    },
     selectOption(option) {
       this.selectedOption = option;
       this.closeAllDropdowns();
     },
     toggleDropdown(option) {
-      // Close all other dropdowns
       this.closeAllDropdowns();
-      // Toggle the clicked dropdown
       option.open = !option.open;
-      // If the dropdown is open, add an event listener to close it when clicking outside
       if (option.open) {
         const closeDropdown = (event) => {
           if (!event.target.closest('.dropdown')) {
@@ -125,53 +91,73 @@ export default {
       });
     },
     getComponentForOption(option) {
-      switch (option) {
-        case "Home":
-          return "MainPage";
-        case "Order":
-          return "OrderPage";
-        case "View Order":
-          return "ViewOrderPage";
-        case "Service 1":
-        case "Service 2":
-        case "Service 3":
-          return "ServicePage";
-        case "Partner 1":
-        case "Partner 2":
-        case "Partner 3":
-          return "PartnerPage";
-        default:
-          return null;
-      }
+      if (option === "Home") return "MainPage";
+      if (option === "Order") return "OrderPage";
+      if (this.services.includes(option)) return "ServicePage";
+      if (this.partners.includes(option)) return "PartnerPage";
+      return null;
     },
-    addService(option) {
+    async addService() {
       if (this.newEntry.trim() !== '') {
-        option.subOptions.push(this.newEntry.trim());
-        this.saveEntries();
+        this.services.push(this.newEntry.trim());
+        await this.saveEntries();
+        this.updateNavbarOptions();
         this.newEntry = '';
       }
     },
-    deleteService(subIndex) {
-      const serviceDropdown = this.navbarOptions.find(option => option.title === 'Service');
-      if (serviceDropdown) {
-        serviceDropdown.subOptions.splice(subIndex, 1);
-        this.saveEntries();
-      }
+    async deleteService(subIndex) {
+      this.services.splice(subIndex, 1);
+      await this.saveEntries();
+      this.updateNavbarOptions();
     },
-    addPartner(option) {
+    async addPartner() {
       if (this.newEntry.trim() !== '') {
-        option.subOptions.push(this.newEntry.trim());
-        this.saveEntries();
+        this.partners.push(this.newEntry.trim());
+        await this.saveEntries();
+        this.updateNavbarOptions();
         this.newEntry = '';
       }
     },
-    deletePartner(subIndex) {
-      const partnerDropdown = this.navbarOptions.find(option => option.title === 'Partners');
-      if (partnerDropdown) {
-        partnerDropdown.subOptions.splice(subIndex, 1);
-        this.saveEntries();
+    async deletePartner(subIndex) {
+      this.partners.splice(subIndex, 1);
+      await this.saveEntries();
+      this.updateNavbarOptions();
+    },
+    async saveEntries() {
+      try {
+        const updatedData = {
+          services: this.services,
+          partners: this.partners,
+        };
+        await fetch('http://localhost:3000/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedData),
+        });
+      } catch (error) {
+        console.error('Error saving data:', error);
       }
     },
+    async loadEntries() {
+      try {
+        const response = await fetch('http://localhost:3000/data');
+        const data = await response.json();
+        this.services = data.services || [];
+        this.partners = data.partners || [];
+        this.updateNavbarOptions();
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    },
+    updateNavbarOptions() {
+      this.navbarOptions.find(option => option.title === 'Store').subOptions = [...this.services];
+      this.navbarOptions.find(option => option.title === 'Logistics').subOptions = [...this.partners];
+    },
+  },
+  async created() {
+    await this.loadEntries();
   }
 };
 </script>
@@ -220,7 +206,7 @@ ul {
   transition: background-color 0.3s ease;
 }
 
-.dropbtn:hover {
+dropbtn:hover {
   background-color: #2980b9;
 }
 

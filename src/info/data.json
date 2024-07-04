@@ -1,0 +1,12 @@
+{
+  "services": [
+    "Store 1",
+    "Store 2",
+    "Store 3"
+  ],
+  "partners": [
+    "Adloggs",
+    "Dunzo",
+    "Shadowfax"
+  ]
+}
