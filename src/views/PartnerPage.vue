@@ -1,6 +1,6 @@
 <template>
   <div class="partner-page">
-    <h2>Partner 1 Page</h2>
+    <h2>{{ partnerTitle }}</h2>
     <div class="partner-details">
       <h3>Partner Details</h3>
       <div class="details-item">
@@ -41,24 +41,29 @@
 
 <script>
 export default {
-  name: 'Partner1Page',
+  name: 'PartnerPage',
+  props: {
+    index: Number,
+    type: String,
+  },
   data() {
     return {
+      partnerTitle: `Partner ${this.index + 1}`,
       partnerName: 'Partner 1',
       location: 'Location 1',
       amount: 'Amount 1',
       editMode: false,
       editedPartnerName: 'Partner 1',
       editedLocation: 'Location 1',
-      editedAmount: 'Amount 1'
+      editedAmount: 'Amount 1',
     };
   },
   methods: {
     saveEdit() {
       // Save edited data to localStorage or backend
-      localStorage.setItem('partnerName1', this.editedPartnerName);
-      localStorage.setItem('location1', this.editedLocation);
-      localStorage.setItem('amount1', this.editedAmount);
+      localStorage.setItem(`partnerName${this.index + 1}`, this.editedPartnerName);
+      localStorage.setItem(`location${this.index + 1}`, this.editedLocation);
+      localStorage.setItem(`amount${this.index + 1}`, this.editedAmount);
       
       // Update current display data
       this.partnerName = this.editedPartnerName;
@@ -78,9 +83,9 @@ export default {
   },
   created() {
     // Load data from localStorage or backend on component creation
-    const storedPartnerName = localStorage.getItem('partnerName1');
-    const storedLocation = localStorage.getItem('location1');
-    const storedAmount = localStorage.getItem('amount1');
+    const storedPartnerName = localStorage.getItem(`partnerName${this.index + 1}`);
+    const storedLocation = localStorage.getItem(`location${this.index + 1}`);
+    const storedAmount = localStorage.getItem(`amount${this.index + 1}`);
     
     if (storedPartnerName) {
       this.partnerName = storedPartnerName;
