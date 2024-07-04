@@ -2,9 +2,9 @@
   <div class="service-page">
     <h2>{{ serviceTitle }}</h2>
     <div class="partner-details">
-      <h3>Service Partner Details</h3>
+      <h3>Store Details</h3>
       <div class="details-item">
-        <label>Partner Name:</label>
+        <label>Store Name:</label>
         <span>{{ partnerName }}</span>
       </div>
       <div class="details-item">
@@ -40,19 +40,38 @@ export default {
   },
   data() {
     return {
-      serviceTitle: `Service ${this.index + 1}`,
-      partnerName: 'Service Partner 1',
-      hasDeliveryPartner: true,
+      serviceTitle: `Store ${this.index + 1}`,
+      partnerName: '',
+      hasDeliveryPartner: false,
       editMode: false,
-      editedPartnerName: 'Service Partner 1',
-      editedHasDeliveryPartner: true,
+      editedPartnerName: '',
+      editedHasDeliveryPartner: false,
     };
   },
+  computed: {
+    storageKeyPrefix() {
+      return `service_${this.index}_`;
+    }
+  },
   methods: {
+    loadServiceData() {
+      // Load data from localStorage or backend on component creation
+      const storedPartnerName = localStorage.getItem(`${this.storageKeyPrefix}partnerName`);
+      const storedHasDeliveryPartner = localStorage.getItem(`${this.storageKeyPrefix}hasDeliveryPartner`);
+      
+      if (storedPartnerName) {
+        this.partnerName = storedPartnerName;
+        this.editedPartnerName = storedPartnerName;
+      }
+      if (storedHasDeliveryPartner) {
+        this.hasDeliveryPartner = storedHasDeliveryPartner === 'true';
+        this.editedHasDeliveryPartner = storedHasDeliveryPartner === 'true';
+      }
+    },
     saveEdit() {
-      // Save edited data to localStorage or backend
-      localStorage.setItem(`partnerName${this.index + 1}`, this.editedPartnerName);
-      localStorage.setItem(`hasDeliveryPartner${this.index + 1}`, this.editedHasDeliveryPartner.toString());
+      // Save edited data to localStorage or backend with unique keys per service
+      localStorage.setItem(`${this.storageKeyPrefix}partnerName`, this.editedPartnerName);
+      localStorage.setItem(`${this.storageKeyPrefix}hasDeliveryPartner`, this.editedHasDeliveryPartner.toString());
       
       // Update current display data
       this.partnerName = this.editedPartnerName;
@@ -69,18 +88,7 @@ export default {
     }
   },
   created() {
-    // Load data from localStorage or backend on component creation
-    const storedPartnerName = localStorage.getItem(`partnerName${this.index + 1}`);
-    const storedHasDeliveryPartner = localStorage.getItem(`hasDeliveryPartner${this.index + 1}`);
-    
-    if (storedPartnerName) {
-      this.partnerName = storedPartnerName;
-      this.editedPartnerName = storedPartnerName;
-    }
-    if (storedHasDeliveryPartner) {
-      this.hasDeliveryPartner = storedHasDeliveryPartner === 'true';
-      this.editedHasDeliveryPartner = storedHasDeliveryPartner === 'true';
-    }
+    this.loadServiceData();
   }
 };
 </script>
