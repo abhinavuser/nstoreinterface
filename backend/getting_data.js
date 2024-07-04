@@ -28,7 +28,7 @@ app.get('/', async (req, res) => {
     const selectedData = { items: data.map(selectData) };
 
     // Path to the output JSON file
-    const outputFilePath = 'D:/project nstore/-/src/info/orders.json';
+    const outputFilePath = '@/src/info/orders.json';
 
     // Write the selected data to the output file
     fs.writeFile(outputFilePath, JSON.stringify(selectedData, null, 2), (err) => {

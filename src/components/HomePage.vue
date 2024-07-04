@@ -36,25 +36,17 @@
 
 <script>
 import OrderPage from '@/views/OrderPage.vue';
-import Service1Page from '@/views/Service1Page.vue';
-import Service2Page from '@/views/Service2Page.vue';
-import Service3Page from '@/views/Service3Page.vue';
-import Partner1Page from '@/views/Partner1Page.vue';
-import Partner2Page from '@/views/Partner2Page.vue';
-import Partner3Page from '@/views/Partner3Page.vue';
 import ViewOrderPage from '@/views/ViewOrderPage.vue';
 import MainPage from '@/views/MainPage.vue';
+import ServicePage from '@/views/ServicePage.vue';
+import PartnerPage from '@/views/PartnerPage.vue';
 
 export default {
   components: {
     OrderPage,
     ViewOrderPage,
-    Service1Page,
-    Service2Page,
-    Service3Page,
-    Partner1Page,
-    Partner2Page,
-    Partner3Page,
+    ServicePage,
+    PartnerPage,
     MainPage,
   },
   data() {
@@ -135,23 +127,19 @@ export default {
     getComponentForOption(option) {
       switch (option) {
         case "Home":
-          return "MainPage"
+          return "MainPage";
         case "Order":
           return "OrderPage";
         case "View Order":
           return "ViewOrderPage";
         case "Service 1":
-          return "Service1Page";
         case "Service 2":
-          return "Service2Page";
         case "Service 3":
-          return "Service3Page";
+          return "ServicePage";
         case "Partner 1":
-          return "Partner1Page";
         case "Partner 2":
-          return "Partner2Page";
         case "Partner 3":
-          return "Partner3Page";
+          return "PartnerPage";
         default:
           return null;
       }

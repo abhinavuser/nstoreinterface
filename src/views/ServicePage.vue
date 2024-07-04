@@ -1,19 +1,15 @@
 <template>
-  <div class="partner-page">
-    <h2>Partner 3 Page</h2>
+  <div class="service-page">
+    <h2>{{ serviceTitle }}</h2>
     <div class="partner-details">
-      <h3>Partner Details</h3>
+      <h3>Service Partner Details</h3>
       <div class="details-item">
         <label>Partner Name:</label>
         <span>{{ partnerName }}</span>
       </div>
       <div class="details-item">
-        <label>Location:</label>
-        <span>{{ location }}</span>
-      </div>
-      <div class="details-item">
-        <label>Amount:</label>
-        <span>{{ amount }}</span>
+        <label>Has Delivery Partner:</label>
+        <span>{{ hasDeliveryPartner ? 'Yes' : 'No' }}</span>
       </div>
       <button class="edit-button" @click="editMode = true">Edit</button>
     </div>
@@ -24,12 +20,8 @@
         <input type="text" id="partnerName" v-model="editedPartnerName">
       </div>
       <div class="edit-item">
-        <label for="location">Location:</label>
-        <input type="text" id="location" v-model="editedLocation">
-      </div>
-      <div class="edit-item">
-        <label for="amount">Amount:</label>
-        <input type="text" id="amount" v-model="editedAmount">
+        <label for="hasDeliveryPartner">Has Delivery Partner:</label>
+        <input type="checkbox" id="hasDeliveryPartner" class="styled-checkbox" v-model="editedHasDeliveryPartner">
       </div>
       <div class="edit-buttons">
         <button class="save-button" @click="saveEdit">Save</button>
@@ -41,65 +33,60 @@
 
 <script>
 export default {
-  name: 'Partner3Page',
+  name: 'ServicePage',
+  props: {
+    index: Number,
+    type: String,
+  },
   data() {
     return {
-      partnerName: 'Partner 3',
-      location: 'Location 3',
-      amount: 'Amount 3',
+      serviceTitle: `Service ${this.index + 1}`,
+      partnerName: 'Service Partner 1',
+      hasDeliveryPartner: true,
       editMode: false,
-      editedPartnerName: 'Partner 3',
-      editedLocation: 'Location 3',
-      editedAmount: 'Amount 3'
+      editedPartnerName: 'Service Partner 1',
+      editedHasDeliveryPartner: true,
     };
   },
   methods: {
     saveEdit() {
       // Save edited data to localStorage or backend
-      localStorage.setItem('partnerName3', this.editedPartnerName);
-      localStorage.setItem('location3', this.editedLocation);
-      localStorage.setItem('amount3', this.editedAmount);
+      localStorage.setItem(`partnerName${this.index + 1}`, this.editedPartnerName);
+      localStorage.setItem(`hasDeliveryPartner${this.index + 1}`, this.editedHasDeliveryPartner.toString());
       
       // Update current display data
       this.partnerName = this.editedPartnerName;
-      this.location = this.editedLocation;
-      this.amount = this.editedAmount;
+      this.hasDeliveryPartner = this.editedHasDeliveryPartner;
       
       this.editMode = false; // Exit edit mode after saving
     },
     cancelEdit() {
       // Reset edited data to current display data
       this.editedPartnerName = this.partnerName;
-      this.editedLocation = this.location;
-      this.editedAmount = this.amount;
+      this.editedHasDeliveryPartner = this.hasDeliveryPartner;
       
       this.editMode = false; // Exit edit mode
     }
   },
   created() {
     // Load data from localStorage or backend on component creation
-    const storedPartnerName = localStorage.getItem('partnerName3');
-    const storedLocation = localStorage.getItem('location3');
-    const storedAmount = localStorage.getItem('amount3');
+    const storedPartnerName = localStorage.getItem(`partnerName${this.index + 1}`);
+    const storedHasDeliveryPartner = localStorage.getItem(`hasDeliveryPartner${this.index + 1}`);
     
     if (storedPartnerName) {
       this.partnerName = storedPartnerName;
       this.editedPartnerName = storedPartnerName;
     }
-    if (storedLocation) {
-      this.location = storedLocation;
-      this.editedLocation = storedLocation;
-    }
-    if (storedAmount) {
-      this.amount = storedAmount;
-      this.editedAmount = storedAmount;
+    if (storedHasDeliveryPartner) {
+      this.hasDeliveryPartner = storedHasDeliveryPartner === 'true';
+      this.editedHasDeliveryPartner = storedHasDeliveryPartner === 'true';
     }
   }
 };
 </script>
 
 <style scoped>
-.partner-page {
+.service-page {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
@@ -162,12 +149,19 @@ export default {
   margin-right: 10px;
 }
 
-.edit-item input[type="text"] {
+.edit-item input[type="text"],
+.edit-item input[type="checkbox"] {
   padding: 10px;
   width: calc(100% - 20px);
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
+}
+
+.styled-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
 }
 
 .edit-buttons {

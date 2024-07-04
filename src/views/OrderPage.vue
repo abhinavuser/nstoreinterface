@@ -7,6 +7,7 @@
           <tr>
             <th>Order ID</th>
             <th>Customer</th>
+            <th>Service</th>
             <th>Amount</th>
             <th>Action</th>
           </tr>
@@ -15,6 +16,7 @@
           <tr v-for="(order, index) in orders" :key="index">
             <td>{{ order.id }}</td>
             <td>{{ order.customer }}</td>
+            <td>{{ order.service }}</td>
             <td>{{ order.amount }}</td>
             <td>
               <button @click="showOrderDetails(order.id)" class="view-order-btn">View Order</button>
