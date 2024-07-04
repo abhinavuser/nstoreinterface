@@ -11,6 +11,9 @@
     "@fortawesome/fontawesome-free": "^6.5.2",
     "axios": "^1.7.2",
     "core-js": "^3.8.3",
+    "express": "^4.19.2",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
     "vue": "^3.2.13",
     "vue-cli": "^2.9.6",
     "vue-router": "^4.4.0"
