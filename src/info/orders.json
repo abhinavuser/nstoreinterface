@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< HEAD
     "id": 99,
     "customer": "Hepatitis C",
     "store": "unknn",
@@ -14,6 +15,8 @@
     "status": "Larva alien"
   },
   {
+=======
+>>>>>>> abe60f30585b5e8f3c880bca79966cd24e847ce7
     "id": 1,
     "customer": "Rick Sanchez",
     "store": "Service 1",
@@ -42,6 +45,7 @@
     "status": "Larva alien"
   },
   {
+<<<<<<< HEAD
     "id": 99,
     "customer": "Hepatitis C",
     "store": "unknown",
@@ -54,5 +58,19 @@
     "store": "unknown",
     "amount": "Alien",
     "status": "Larva alien"
+=======
+    "id": 800,
+    "customer": "Super Turkey",
+    "service": "Male",
+    "amount": "Humanoid",
+    "status": "Turkey Human Mix"
+  },
+  {
+    "id": 801,
+    "customer": "7+7 Years Old Morty",
+    "service": "Male",
+    "amount": "Human",
+    "status": ""
+>>>>>>> abe60f30585b5e8f3c880bca79966cd24e847ce7
   }
 ]

@@ -7,7 +7,7 @@ const app = express();
 const port = 8000;
 
 // Connect to SQLite database
-const db = new sqlite3.Database("E:/VS Code/nstoreproject/vue-navbar/src/info/data.sqlite", (err) => {
+const db = new sqlite3.Database("../src/info/data.sqlite", (err) => {
   if (err) {
     console.error('Error connecting to database', err.message);
   } else {
@@ -45,7 +45,7 @@ let selectData = (data) => {
 app.get('/', async (req, res) => {
   try {
     // URL of the API to fetch data from
-    const apiUrl = 'https://rickandmortyapi.com/api/character/99,199';
+    const apiUrl = 'https://rickandmortyapi.com/api/character/800,801';
 
     // Fetch data from the API
     const response = await axios.get(apiUrl);
@@ -79,7 +79,7 @@ app.get('/', async (req, res) => {
     });
 
     // Path to the output JSON file
-    const outputFilePath = "E:/VS Code/nstoreproject/vue-navbar/src/info/orders.json";
+    const outputFilePath = "../src/info/orders.json";
 
     // Read the existing data from the JSON file
     fs.readFile(outputFilePath, 'utf8', (err, fileData) => {
@@ -129,3 +129,4 @@ app.get('/', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+//hii
