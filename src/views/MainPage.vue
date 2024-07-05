@@ -135,7 +135,7 @@ export default {
 }
 
 .theme-dark {
-  --navbar-bg: #343a40;
+  --navbar-bg: #333;
   --link-color: rgba(255, 255, 255, 0.5);
   --link-active-color: rgba(255, 255, 255, 0.9);
 }

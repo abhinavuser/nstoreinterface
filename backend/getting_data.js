@@ -4,10 +4,10 @@ const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
-const port = 3000;
+const port = 8000;
 
 // Connect to SQLite database
-const db = new sqlite3.Database("D:/project nstore/-/src/info/data.sqlite", (err) => {
+const db = new sqlite3.Database("E:/VS Code/nstoreproject/vue-navbar/src/info/data.sqlite", (err) => {
   if (err) {
     console.error('Error connecting to database', err.message);
   } else {
@@ -79,7 +79,7 @@ app.get('/', async (req, res) => {
     });
 
     // Path to the output JSON file
-    const outputFilePath = "D:/project nstore/-/src/info/orders.json";
+    const outputFilePath = "E:/VS Code/nstoreproject/vue-navbar/src/info/orders.json";
 
     // Read the existing data from the JSON file
     fs.readFile(outputFilePath, 'utf8', (err, fileData) => {
