@@ -1,14 +1,26 @@
 [
-    {
-      "id": 1,
-      "customer": "Rick Sanchez",
-      "service": "Service 1",
-      "amount": "Human"
-    },
-    {
-      "id": 183,
-      "customer": "Johnny Depp",
-      "service": "Service 2",
-      "amount": "Human"
-    }
+  {
+    "id": 69,
+    "customer": "Commander Rick",
+    "store": "Male",
+    "amount": "Human",
+    "status": "",
+    "orderUrl": "https://rickandmortyapi.com/api/location/3",
+    "quoteUrl": "",
+    "statusUrl": "https://rickandmortyapi.com/api/character/avatar/69.jpeg",
+    "pickup": "unknown",
+    "drop": "Citadel of Ricks"
+  },
+  {
+    "id": 96,
+    "customer": "Tuberculosis",
+    "store": "unknown",
+    "amount": "Disease",
+    "status": "",
+    "orderUrl": "https://rickandmortyapi.com/api/location/5",
+    "quoteUrl": "https://rickandmortyapi.com/api/location/5",
+    "statusUrl": "https://rickandmortyapi.com/api/character/avatar/96.jpeg",
+    "pickup": "Anatomy Park",
+    "drop": "Anatomy Park"
+  }
 ]
