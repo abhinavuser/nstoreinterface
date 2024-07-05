@@ -1,3 +1,4 @@
+//THIS SHOULD RUN ONLY IN 3000 PORT 
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
