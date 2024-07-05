@@ -9,8 +9,8 @@
             <th>Customer</th>
             <th>Service</th>
             <th>Amount</th>
-            <th>Action</th>
             <th>Status</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -19,10 +19,10 @@
             <td>{{ order.customer }}</td>
             <td>{{ order.service }}</td>
             <td>{{ order.amount }}</td>
+            <td>{{ order.status }}</td>
             <td>
               <button @click="showOrderDetails(order.id)" class="view-order-btn">View Order</button>
             </td>
-            <td>{{ order.status }}</td>
           </tr>
         </tbody>
       </table>
