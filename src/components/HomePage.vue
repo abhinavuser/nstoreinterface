@@ -7,13 +7,13 @@
           <div v-else class="dropdown">
             <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
             <div v-show="option.open" class="dropdown-content">
-              <form @submit.prevent="option.title === 'Store' ? addService() : addPartner()">
+              <form @submit.prevent="option.title === 'Store' ? addStore() : addPartner()">
                 <input v-model="newEntry" :placeholder="'Enter new ' + option.title.toLowerCase()" />
                 <button type="submit">{{ option.title === 'Store' ? 'Add Store' : 'Add Logistics' }}</button>
               </form>
               <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
                 {{ subOption }}
-                <button @click.stop="option.title === 'Store' ? deleteService(subIndex) : deletePartner(subIndex)" class="delete-btn">
+                <button @click.stop="option.title === 'Store' ? deleteStore(subIndex) : deletePartner(subIndex)" class="delete-btn">
                   {{ option.title === 'Store' ? 'Delete Store' : 'Delete Logistics' }}
                 </button>
               </a>
@@ -36,21 +36,21 @@
 import OrderPage from '@/views/OrderPage.vue';
 import ViewOrderPage from '@/views/ViewOrderPage.vue';
 import MainPage from '@/views/MainPage.vue';
-import ServicePage from '@/views/ServicePage.vue';
+import StorePage from '@/views/StorePage.vue';
 import PartnerPage from '@/views/PartnerPage.vue';
 
 export default {
   components: {
     OrderPage,
     ViewOrderPage,
-    ServicePage,
+    StorePage,
     PartnerPage,
     MainPage,
   },
   data() {
     return {
       newEntry: '',
-      services: [],
+      stores: [],
       partners: [],
       navbarOptions: [
         "Home",
@@ -93,20 +93,20 @@ export default {
     getComponentForOption(option) {
       if (option === "Home") return "MainPage";
       if (option === "Order") return "OrderPage";
-      if (this.services.includes(option)) return "ServicePage";
+      if (this.stores.includes(option)) return "StorePage";
       if (this.partners.includes(option)) return "PartnerPage";
       return null;
     },
-    async addService() {
+    async addStore() {
       if (this.newEntry.trim() !== '') {
-        this.services.push(this.newEntry.trim());
+        this.stores.push(this.newEntry.trim());
         await this.saveEntries();
         this.updateNavbarOptions();
         this.newEntry = '';
       }
     },
-    async deleteService(subIndex) {
-      this.services.splice(subIndex, 1);
+    async deleteStore(subIndex) {
+      this.stores.splice(subIndex, 1);
       await this.saveEntries();
       this.updateNavbarOptions();
     },
@@ -126,7 +126,7 @@ export default {
     async saveEntries() {
       try {
         const updatedData = {
-          services: this.services,
+          stores: this.stores,
           partners: this.partners,
         };
         await fetch('http://localhost:3000/update', {
@@ -144,7 +144,7 @@ export default {
       try {
         const response = await fetch('http://localhost:3000/data');
         const data = await response.json();
-        this.services = data.services || [];
+        this.stores = data.stores || [];
         this.partners = data.partners || [];
         this.updateNavbarOptions();
       } catch (error) {
@@ -152,7 +152,7 @@ export default {
       }
     },
     updateNavbarOptions() {
-      this.navbarOptions.find(option => option.title === 'Store').subOptions = [...this.services];
+      this.navbarOptions.find(option => option.title === 'Store').subOptions = [...this.stores];
       this.navbarOptions.find(option => option.title === 'Logistics').subOptions = [...this.partners];
     },
   },

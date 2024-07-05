@@ -19,7 +19,7 @@ const db = new sqlite3.Database("E:/VS Code/nstoreproject/vue-navbar/src/info/da
 db.run(`CREATE TABLE IF NOT EXISTS Orders_details (
   id INTEGER PRIMARY KEY UNIQUE,
   customer_name TEXT,
-  service TEXT,
+  store TEXT,
   amount TEXT,
   status TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -35,10 +35,10 @@ db.run(`CREATE TABLE IF NOT EXISTS Orders_details (
 let selectData = (data) => {
   let id = data.id;
   let customer = data.name; // Ensure 'name' matches the API response field
-  let service = data.gender; // Ensure 'gender' matches the API response field
+  let store = data.gender; // Ensure 'gender' matches the API response field
   let amount = data.species; // Ensure 'species' matches the API response field
   let status = data.type; // Ensure 'type' matches the API response field
-  return { id, customer, service, amount, status };
+  return { id, customer, store, amount, status };
 };
 
 // Endpoint to fetch, select, and save JSON data
@@ -56,8 +56,8 @@ app.get('/', async (req, res) => {
 
     // Insert data into SQLite database
     selectedData.forEach((data) => {
-      db.run(`INSERT INTO Orders_details (id, customer_name, service, amount, status) VALUES (?, ?, ?, ?, ?)`,
-        [data.id, data.customer, data.service, data.amount, data.status],
+      db.run(`INSERT INTO Orders_details (id, customer_name, store, amount, status) VALUES (?, ?, ?, ?, ?)`,
+        [data.id, data.customer, data.store, data.amount, data.status],
         function(err) {
           if (err) {
             console.error('Error inserting data:', err.message);
@@ -73,7 +73,7 @@ app.get('/', async (req, res) => {
         console.error('Error querying data:', err.message);
       } else {
         rows.forEach(row => {
-          console.log(row.id, row.customer_name, row.service, row.amount, row.status);
+          console.log(row.id, row.customer_name, row.store, row.amount, row.status);
         });
       }
     });

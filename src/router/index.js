@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import HomePage from '@/views/HomePage.vue';
 import OrderPage from '@/views/OrderPage.vue';
-import ServicePage from '@/views/ServicePage.vue';
+import ServicePage from '@/views/StorePage.vue';
 import PartnerPage from '@/views/PartnerPage.vue';
 import ViewOrderPage from '@/views/ViewOrderPage.vue';
 

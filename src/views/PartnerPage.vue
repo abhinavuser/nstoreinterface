@@ -20,7 +20,7 @@
     <div v-if="editMode" class="edit-details">
       <h3>Edit Details</h3>
       <div class="edit-item">
-        <label for="partnerName">Partner Name:</label>
+        <label for="partnerName">Logistics Name:</label>
         <input type="text" id="partnerName" v-model="editedPartnerName">
       </div>
       <div class="edit-item">

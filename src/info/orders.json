@@ -2,56 +2,56 @@
   {
     "id": 99,
     "customer": "Hepatitis C",
-    "service": "unknn",
+    "store": "unknn",
     "amount": "Disease",
     "status": ""
   },
   {
     "id": 199,
     "customer": "Larva Alien",
-    "service": "unknown",
+    "store": "unknown",
     "amount": "Alien",
     "status": "Larva alien"
   },
   {
     "id": 1,
     "customer": "Rick Sanchez",
-    "service": "Service 1",
+    "store": "Service 1",
     "amount": "Human",
     "status": "Completed"
   },
   {
     "id": 183,
     "customer": "Johnny Depp",
-    "service": "Service 2",
+    "store": "Service 2",
     "amount": "Human",
     "status": "Pending"
   },
   {
     "id": 99,
     "customer": "Hepatitis C",
-    "service": "unknown",
+    "store": "unknown",
     "amount": "Disease",
     "status": ""
   },
   {
     "id": 199,
     "customer": "Larva Alien",
-    "service": "unknown",
+    "store": "unknown",
     "amount": "Alien",
     "status": "Larva alien"
   },
   {
     "id": 99,
     "customer": "Hepatitis C",
-    "service": "unknown",
+    "store": "unknown",
     "amount": "Disease",
     "status": ""
   },
   {
     "id": 199,
     "customer": "Larva Alien",
-    "service": "unknown",
+    "store": "unknown",
     "amount": "Alien",
     "status": "Larva alien"
   }

@@ -7,7 +7,7 @@
           <tr>
             <th>Order ID</th>
             <th>Customer</th>
-            <th>Service</th>
+            <th>Store</th>
             <th>Amount</th>
             <th>Status</th>
             <th>Action</th>
@@ -17,7 +17,7 @@
           <tr v-for="(order, index) in orders" :key="index">
             <td>{{ order.id }}</td>
             <td>{{ order.customer }}</td>
-            <td>{{ order.service }}</td>
+            <td>{{ order.store }}</td>
             <td>{{ order.amount }}</td>
             <td>{{ order.status }}</td>
             <td>

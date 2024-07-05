@@ -1,6 +1,6 @@
 <template>
-  <div class="service-page">
-    <h2>{{ serviceTitle }}</h2>
+  <div class="store-page">
+    <h2>{{ storeTitle }}</h2>
     <div class="partner-details">
       <h3>Store Details</h3>
       <div class="details-item">
@@ -16,7 +16,7 @@
     <div v-if="editMode" class="edit-details">
       <h3>Edit Details</h3>
       <div class="edit-item">
-        <label for="partnerName">Partner Name:</label>
+        <label for="partnerName">Store Name:</label>
         <input type="text" id="partnerName" v-model="editedPartnerName">
       </div>
       <div class="edit-item">
@@ -33,14 +33,14 @@
 
 <script>
 export default {
-  name: 'ServicePage',
+  name: 'StorePage',
   props: {
     index: Number,
     type: String,
   },
   data() {
     return {
-      serviceTitle: `Store ${this.index + 1}`,
+      storeTitle: `Store ${this.index + 1}`,
       partnerName: '',
       hasDeliveryPartner: false,
       editMode: false,
@@ -50,11 +50,11 @@ export default {
   },
   computed: {
     storageKeyPrefix() {
-      return `service_${this.index}_`;
+      return `store_${this.index}_`;
     }
   },
   methods: {
-    loadServiceData() {
+    loadStoreData() {
       // Load data from localStorage or backend on component creation
       const storedPartnerName = localStorage.getItem(`${this.storageKeyPrefix}partnerName`);
       const storedHasDeliveryPartner = localStorage.getItem(`${this.storageKeyPrefix}hasDeliveryPartner`);
@@ -88,13 +88,13 @@ export default {
     }
   },
   created() {
-    this.loadServiceData();
+    this.loadStoreData();
   }
 };
 </script>
 
 <style scoped>
-.service-page {
+.store-page {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
