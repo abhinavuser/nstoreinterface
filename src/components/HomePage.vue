@@ -126,6 +126,20 @@ export default {
       await this.saveEntries();
       this.updateNavbarOptions();
     },
+    async updateDetails(updatedDetails) {
+      // Update details in stores or partners array
+      if (this.stores.some(store => store.name === updatedDetails.name)) {
+        const index = this.stores.findIndex(store => store.name === updatedDetails.name);
+        this.$set(this.stores, index, updatedDetails); // Vue reactive update
+      } else if (this.partners.some(partner => partner.name === updatedDetails.name)) {
+        const index = this.partners.findIndex(partner => partner.name === updatedDetails.name);
+        this.$set(this.partners, index, updatedDetails); // Vue reactive update
+      }
+
+      // Save updated data and update navbar options
+      await this.saveEntries();
+      this.updateNavbarOptions();
+    },
     async saveEntries() {
       try {
         const updatedData = {
@@ -133,13 +147,18 @@ export default {
           partners: this.partners,
         };
         console.log('Updating data:', updatedData); // Log data being sent to server
-        await fetch('http://localhost:3000/update', {
+        const response = await fetch('http://localhost:3000/update', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(updatedData),
         });
+        if (response.ok) {
+          console.log('Data updated successfully');
+        } else {
+          console.error('Failed to update data:', response.status, response.statusText);
+        }
       } catch (error) {
         console.error('Error saving data:', error);
       }
@@ -147,6 +166,9 @@ export default {
     async loadEntries() {
       try {
         const response = await fetch('http://localhost:3000/data');
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
         const data = await response.json();
         this.stores = data.stores || [];
         this.partners = data.partners || [];
@@ -156,27 +178,14 @@ export default {
       }
     },
     updateNavbarOptions() {
+      // Update your navbarOptions with the updated stores and partners
       this.navbarOptions.find(option => option.title === 'Store').subOptions = [...this.stores];
       this.navbarOptions.find(option => option.title === 'Logistics').subOptions = [...this.partners];
-    },
-    async updateDetails(updatedDetails) {
-      // Update details in stores or partners array
-      if (this.stores.some(store => store.name === updatedDetails.name)) {
-        const index = this.stores.findIndex(store => store.name === updatedDetails.name);
-        this.stores.splice(index, 1, updatedDetails);
-      } else if (this.partners.some(partner => partner.name === updatedDetails.name)) {
-        const index = this.partners.findIndex(partner => partner.name === updatedDetails.name);
-        this.partners.splice(index, 1, updatedDetails);
-      }
-
-      // Save updated data and update navbar options
-      await this.saveEntries();
-      this.updateNavbarOptions();
     },
   },
   async mounted() {
     await this.loadEntries();
-  }
+  },
 };
 </script>
 
