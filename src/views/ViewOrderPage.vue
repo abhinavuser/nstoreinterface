@@ -7,9 +7,10 @@
         <p><strong>Customer:</strong> {{ selectedOrder.customer }}</p>
         <p><strong>Amount:</strong> ₹{{ selectedOrder.amount }}</p>
         <p v-if="selectedOrder.phone"><strong>Phone Number:</strong> {{ selectedOrder.phone }}</p>
+        <p v-if="orderUrl"><strong>Order URL:</strong> <a :href="orderUrl" target="_blank">{{ orderUrl }}</a></p>
         <!-- Display additional order details here -->
       </div>
-      <div class="tracking-details">
+      <div class="tracking-details" v-if="trackingDetails">
         <h3>Tracking Details</h3>
         <ul>
           <li v-for="(status, index) in trackingDetails" :key="index" :class="{ completed: status.completed }">
@@ -25,6 +26,7 @@
 
 <script>
 import ordersData from '@/info/orders.json';
+import trackingData from '@/info/track.json'; // Import the tracking data
 
 export default {
   props: {
@@ -37,19 +39,26 @@ export default {
     return {
       orders: [],
       selectedOrder: null,
-      trackingDetails: [
-        { text: 'Created', completed: true },
-        { text: 'Assigned', completed: true },
-        { text: 'Arrived at pickup', completed: false },
-        { text: 'Picked up', completed: false },
-        { text: 'Arrived', completed: false },
-        { text: 'Delivered', completed: false }
-      ]
+      trackingDetails: null, // Initialize as null
+      orderUrl: '', // Initialize as an empty string
     };
   },
   created() {
     this.orders = ordersData;
     this.selectedOrder = this.orders.find(order => order.id === this.orderId);
+    this.fetchTrackingDetails();
+  },
+  methods: {
+    fetchTrackingDetails() {
+      const trackingInfo = trackingData.find(track => track.orderId === this.orderId);
+      if (trackingInfo) {
+        this.trackingDetails = trackingInfo.trackingDetails;
+        this.orderUrl = trackingInfo.orderUrl; // Fetch the order URL
+      } else {
+        this.trackingDetails = [];
+        this.orderUrl = ''; // Reset the order URL
+      }
+    }
   },
 };
 </script>

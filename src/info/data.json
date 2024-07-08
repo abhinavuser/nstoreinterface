@@ -11,10 +11,6 @@
     {
       "name": "Store 3",
       "hasDeliveryPartner": true
-    },
-    {
-      "name": "Store jacob",
-      "hasDeliveryPartner": false
     }
   ],
   "partners": [

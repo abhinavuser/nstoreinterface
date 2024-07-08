@@ -2,6 +2,12 @@
   <div>
     <div v-if="!showOrderDetailsPage">
       <h2>Orders</h2>
+      <div class="filter-buttons">
+        <button :class="{ active: filter === 'All' }" @click="setFilter('All')">All</button>
+        <button :class="{ active: filter === 'Completed' }" @click="setFilter('Completed')">Completed</button>
+        <button :class="{ active: filter === 'Pending' }" @click="setFilter('Pending')">Pending</button>
+        <button :class="{ active: filter === 'Failed' }" @click="setFilter('Failed')">Failed</button>
+      </div>
       <table class="order-table">
         <thead>
           <tr>
@@ -14,7 +20,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(order, index) in orders" :key="index">
+          <tr v-for="(order, index) in filteredOrders" :key="index">
             <td>{{ order.id }}</td>
             <td>{{ order.customer }}</td>
             <td>{{ order.store }}</td>
@@ -46,7 +52,17 @@ export default {
       showOrderDetailsPage: false,
       selectedOrderId: null,
       orders: [],
+      filter: 'All', // Default filter
     };
+  },
+  computed: {
+    filteredOrders() {
+      if (this.filter === 'All') {
+        return this.orders;
+      } else {
+        return this.orders.filter(order => order.status === this.filter);
+      }
+    }
   },
   created() {
     this.orders = ordersData;
@@ -55,6 +71,9 @@ export default {
     showOrderDetails(orderId) {
       this.selectedOrderId = orderId;
       this.showOrderDetailsPage = true;
+    },
+    setFilter(status) {
+      this.filter = status;
     },
   },
 };
@@ -123,4 +142,32 @@ h2 {
   font-size: 24px;
   color: #343a40;
 }
+
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  border: none;
+  background-color: #f0f0f0;
+  color: #343a40;
+  padding: 10px 20px;
+  font-size: 14px;
+  margin: 0 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.filter-buttons button:hover {
+  background-color: #e0e0e0;
+}
+
+.filter-buttons button.active {
+  background-color: #3498db;
+  color: white;
+}
 </style>
+
