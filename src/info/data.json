@@ -1,12 +1,37 @@
 {
   "stores": [
-    "Store 1",
-    "Store 2",
-    "Store 3"
+    {
+      "name": "Store 1",
+      "hasDeliveryPartner": true
+    },
+    {
+      "name": "Store 2",
+      "hasDeliveryPartner": false
+    },
+    {
+      "name": "Store 3",
+      "hasDeliveryPartner": true
+    },
+    {
+      "name": "Store jacob",
+      "hasDeliveryPartner": false
+    }
   ],
   "partners": [
-    "Adloggs",
-    "Dunzo",
-    "Shadowfax"
+    {
+      "name": "Adloggs",
+      "location": "Location 1",
+      "amount": "1000"
+    },
+    {
+      "name": "Dunzo",
+      "location": "Location 2",
+      "amount": "1500"
+    },
+    {
+      "name": "Shadowfax",
+      "location": "Location 3",
+      "amount": "1200"
+    }
   ]
 }

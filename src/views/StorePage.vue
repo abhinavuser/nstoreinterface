@@ -1,207 +1,111 @@
 <template>
   <div class="store-page">
     <h2>{{ storeTitle }}</h2>
-    <div class="partner-details">
+    <div class="store-details">
       <h3>Store Details</h3>
       <div class="details-item">
         <label>Store Name:</label>
-        <span>{{ partnerName }}</span>
+        <span>{{ storeDetails.name }}</span>
       </div>
       <div class="details-item">
         <label>Has Delivery Partner:</label>
-        <span>{{ hasDeliveryPartner ? 'Yes' : 'No' }}</span>
+        <span>{{ storeDetails.hasDeliveryPartner ? 'Yes' : 'No' }}</span>
       </div>
       <button class="edit-button" @click="editMode = true">Edit</button>
     </div>
-    <div v-if="editMode" class="edit-details">
-      <h3>Edit Details</h3>
-      <div class="edit-item">
-        <label for="partnerName">Store Name:</label>
-        <input type="text" id="partnerName" v-model="editedPartnerName">
-      </div>
-      <div class="edit-item">
-        <label for="hasDeliveryPartner">Has Delivery Partner:</label>
-        <input type="checkbox" id="hasDeliveryPartner" class="styled-checkbox" v-model="editedHasDeliveryPartner">
-      </div>
-      <div class="edit-buttons">
-        <button class="save-button" @click="saveEdit">Save</button>
-        <button class="cancel-button" @click="cancelEdit">Cancel</button>
-      </div>
+    <div class="edit-form" v-if="editMode">
+      <h3>Edit Store Details</h3>
+      <form @submit.prevent="saveStoreDetails">
+        <div class="form-item">
+          <label>Store Name:</label>
+          <input v-model="editStoreDetails.name" />
+        </div>
+        <div class="form-item">
+          <label>Has Delivery Partner:</label>
+          <input type="checkbox" v-model="editStoreDetails.hasDeliveryPartner" />
+        </div>
+        <button type="submit">Save</button>
+        <button type="button" @click="editMode = false">Cancel</button>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'StorePage',
   props: {
-    index: Number,
-    type: String,
+    details: Object,
   },
   data() {
     return {
-      storeTitle: `Store ${this.index + 1}`,
-      partnerName: '',
-      hasDeliveryPartner: false,
       editMode: false,
-      editedPartnerName: '',
-      editedHasDeliveryPartner: false,
+      editStoreDetails: { ...this.details },
     };
   },
   computed: {
-    storageKeyPrefix() {
-      return `store_${this.index}_`;
-    }
+    storeTitle() {
+      return this.details ? this.details.name : 'Store Page';
+    },
+    storeDetails() {
+      return this.details;
+    },
   },
   methods: {
-    loadStoreData() {
-      // Load data from localStorage or backend on component creation
-      const storedPartnerName = localStorage.getItem(`${this.storageKeyPrefix}partnerName`);
-      const storedHasDeliveryPartner = localStorage.getItem(`${this.storageKeyPrefix}hasDeliveryPartner`);
-      
-      if (storedPartnerName) {
-        this.partnerName = storedPartnerName;
-        this.editedPartnerName = storedPartnerName;
-      }
-      if (storedHasDeliveryPartner) {
-        this.hasDeliveryPartner = storedHasDeliveryPartner === 'true';
-        this.editedHasDeliveryPartner = storedHasDeliveryPartner === 'true';
-      }
+    async saveStoreDetails() {
+      this.editMode = false;
+      this.$emit('update-details', this.editStoreDetails);
     },
-    saveEdit() {
-      // Save edited data to localStorage or backend with unique keys per service
-      localStorage.setItem(`${this.storageKeyPrefix}partnerName`, this.editedPartnerName);
-      localStorage.setItem(`${this.storageKeyPrefix}hasDeliveryPartner`, this.editedHasDeliveryPartner.toString());
-      
-      // Update current display data
-      this.partnerName = this.editedPartnerName;
-      this.hasDeliveryPartner = this.editedHasDeliveryPartner;
-      
-      this.editMode = false; // Exit edit mode after saving
-    },
-    cancelEdit() {
-      // Reset edited data to current display data
-      this.editedPartnerName = this.partnerName;
-      this.editedHasDeliveryPartner = this.hasDeliveryPartner;
-      
-      this.editMode = false; // Exit edit mode
-    }
   },
-  created() {
-    this.loadStoreData();
-  }
 };
 </script>
 
 <style scoped>
 .store-page {
-  max-width: 600px;
-  margin: 0 auto;
   padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  border-radius: 5px;
+  margin-top: 20px;
 }
 
-.partner-details {
+.store-details {
   margin-bottom: 20px;
 }
 
-.partner-details h3 {
-  font-size: 1.2em;
-  margin-bottom: 10px;
-}
-
 .details-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.details-item label {
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.edit-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.edit-button:hover {
-  background-color: #0056b3;
-}
-
-.edit-details {
-  background-color: #fff;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-.edit-details h3 {
-  font-size: 1.2em;
   margin-bottom: 10px;
 }
 
-.edit-item {
+.edit-form {
+  margin-top: 20px;
+}
+
+.form-item {
   margin-bottom: 10px;
 }
 
-.edit-item label {
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.edit-item input[type="text"],
-.edit-item input[type="checkbox"] {
-  padding: 10px;
-  width: calc(100% - 20px);
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.styled-checkbox {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
-}
-
-.edit-buttons {
-  margin-top: 15px;
-  text-align: right;
-}
-
-.save-button,
-.cancel-button {
-  padding: 10px 20px;
+.edit-button, button {
+  padding: 10px 15px;
+  background-color: #3498db;
+  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
-.save-button {
-  background-color: #28a745;
-  color: white;
+.edit-button:hover, button:hover {
+  background-color: #2980b9;
+}
+
+button[type="submit"] {
   margin-right: 10px;
 }
 
-.save-button:hover {
-  background-color: #218838;
+button[type="button"] {
+  background-color: #e74c3c;
 }
 
-.cancel-button {
-  background-color: #dc3545;
-  color: white;
-}
-
-.cancel-button:hover {
-  background-color: #c82333;
+button[type="button"]:hover {
+  background-color: #c0392b;
 }
 </style>

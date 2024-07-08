@@ -3,32 +3,43 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 const port = 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:8080', // Allow requests from localhost:8080
+}));
 app.use(bodyParser.json());
 
-const dataFilePath = '../src/info/data.json';
+const dataFilePath = path.join(__dirname, '../src/info/data.json');
 
 app.get('/data', (req, res) => {
   fs.readFile(dataFilePath, 'utf8', (err, data) => {
     if (err) {
-      res.status(500).send('Error reading data file');
-      return;
+      console.error('Error reading data.json:', err);
+      res.status(500).send({ message: 'Error reading data.json', error: err });
+    } else {
+      try {
+        const jsonData = JSON.parse(data);
+        res.json(jsonData);
+      } catch (parseError) {
+        console.error('Error parsing data.json:', parseError);
+        res.status(500).send({ message: 'Error parsing data.json', error: parseError });
+      }
     }
-    res.send(JSON.parse(data));
   });
 });
 
 app.post('/update', (req, res) => {
   const updatedData = req.body;
-  fs.writeFile(dataFilePath, JSON.stringify(updatedData, null, 2), 'utf8', (err) => {
+  fs.writeFile(dataFilePath, JSON.stringify(updatedData, null, 2), (err) => {
     if (err) {
-      res.status(500).send('Error writing data file');
-      return;
+      console.error('Error writing to data.json:', err);
+      res.status(500).send({ message: 'Error writing to data.json', error: err });
+    } else {
+      res.send({ message: 'Data updated successfully' });
     }
-    res.send('Data updated successfully');
   });
 });
 

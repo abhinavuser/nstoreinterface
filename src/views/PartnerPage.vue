@@ -4,207 +4,116 @@
     <div class="partner-details">
       <h3>Partner Details</h3>
       <div class="details-item">
-        <label>Logistics Name:</label>
-        <span>{{ partnerName }}</span>
+        <label>Partner Name:</label>
+        <span>{{ partnerDetails.name }}</span>
       </div>
       <div class="details-item">
         <label>Location:</label>
-        <span>{{ location }}</span>
+        <span>{{ partnerDetails.location }}</span>
       </div>
       <div class="details-item">
         <label>Amount:</label>
-        <span>{{ amount }}</span>
+        <span>{{ partnerDetails.amount }}</span>
       </div>
       <button class="edit-button" @click="editMode = true">Edit</button>
     </div>
-    <div v-if="editMode" class="edit-details">
-      <h3>Edit Details</h3>
-      <div class="edit-item">
-        <label for="partnerName">Logistics Name:</label>
-        <input type="text" id="partnerName" v-model="editedPartnerName">
-      </div>
-      <div class="edit-item">
-        <label for="location">Location:</label>
-        <input type="text" id="location" v-model="editedLocation">
-      </div>
-      <div class="edit-item">
-        <label for="amount">Amount:</label>
-        <input type="text" id="amount" v-model="editedAmount">
-      </div>
-      <div class="edit-buttons">
-        <button class="save-button" @click="saveEdit">Save</button>
-        <button class="cancel-button" @click="cancelEdit">Cancel</button>
-      </div>
+    <div class="edit-form" v-if="editMode">
+      <h3>Edit Partner Details</h3>
+      <form @submit.prevent="savePartnerDetails">
+        <div class="form-item">
+          <label>Partner Name:</label>
+          <input v-model="editPartnerDetails.name" />
+        </div>
+        <div class="form-item">
+          <label>Location:</label>
+          <input v-model="editPartnerDetails.location" />
+        </div>
+        <div class="form-item">
+          <label>Amount:</label>
+          <input v-model="editPartnerDetails.amount" />
+        </div>
+        <button type="submit">Save</button>
+        <button type="button" @click="editMode = false">Cancel</button>
+      </form>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'PartnerPage',
   props: {
-    index: Number,
-    type: String,
+    details: Object,
   },
   data() {
     return {
-      partnerTitle: `Partner ${this.index + 1}`,
-      partnerName: 'Partner 1',
-      location: 'Location 1',
-      amount: 'Amount 1',
       editMode: false,
-      editedPartnerName: 'Partner 1',
-      editedLocation: 'Location 1',
-      editedAmount: 'Amount 1',
+      editPartnerDetails: { ...this.details },
     };
   },
-  methods: {
-    saveEdit() {
-      // Save edited data to localStorage or backend
-      localStorage.setItem(`partnerName${this.index + 1}`, this.editedPartnerName);
-      localStorage.setItem(`location${this.index + 1}`, this.editedLocation);
-      localStorage.setItem(`amount${this.index + 1}`, this.editedAmount);
-      
-      // Update current display data
-      this.partnerName = this.editedPartnerName;
-      this.location = this.editedLocation;
-      this.amount = this.editedAmount;
-      
-      this.editMode = false; // Exit edit mode after saving
+  computed: {
+    partnerTitle() {
+      return this.details ? this.details.name : 'Partner Page';
     },
-    cancelEdit() {
-      // Reset edited data to current display data
-      this.editedPartnerName = this.partnerName;
-      this.editedLocation = this.location;
-      this.editedAmount = this.amount;
-      
-      this.editMode = false; // Exit edit mode
-    }
+    partnerDetails() {
+      return this.details;
+    },
   },
-  created() {
-    // Load data from localStorage or backend on component creation
-    const storedPartnerName = localStorage.getItem(`partnerName${this.index + 1}`);
-    const storedLocation = localStorage.getItem(`location${this.index + 1}`);
-    const storedAmount = localStorage.getItem(`amount${this.index + 1}`);
-    
-    if (storedPartnerName) {
-      this.partnerName = storedPartnerName;
-      this.editedPartnerName = storedPartnerName;
-    }
-    if (storedLocation) {
-      this.location = storedLocation;
-      this.editedLocation = storedLocation;
-    }
-    if (storedAmount) {
-      this.amount = storedAmount;
-      this.editedAmount = storedAmount;
-    }
-  }
+  methods: {
+    async savePartnerDetails() {
+      this.editMode = false;
+      this.$emit('update-details', this.editPartnerDetails);
+    },
+  },
 };
 </script>
 
 <style scoped>
 .partner-page {
-  max-width: 600px;
-  margin: 0 auto;
   padding: 20px;
   border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  border-radius: 5px;
+  margin-top: 20px;
 }
 
 .partner-details {
   margin-bottom: 20px;
 }
 
-.partner-details h3 {
-  font-size: 1.2em;
-  margin-bottom: 10px;
-}
-
 .details-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.details-item label {
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.edit-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.edit-button:hover {
-  background-color: #0056b3;
-}
-
-.edit-details {
-  background-color: #fff;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-.edit-details h3 {
-  font-size: 1.2em;
   margin-bottom: 10px;
 }
 
-.edit-item {
+.edit-form {
+  margin-top: 20px;
+}
+
+.form-item {
   margin-bottom: 10px;
 }
 
-.edit-item label {
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.edit-item input[type="text"] {
-  padding: 10px;
-  width: calc(100% - 20px);
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.edit-buttons {
-  margin-top: 15px;
-  text-align: right;
-}
-
-.save-button,
-.cancel-button {
-  padding: 10px 20px;
+.edit-button, button {
+  padding: 10px 15px;
+  background-color: #3498db;
+  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
-.save-button {
-  background-color: #28a745;
-  color: white;
+.edit-button:hover, button:hover {
+  background-color: #2980b9;
+}
+
+button[type="submit"] {
   margin-right: 10px;
 }
 
-.save-button:hover {
-  background-color: #218838;
+button[type="button"] {
+  background-color: #e74c3c;
 }
 
-.cancel-button {
-  background-color: #dc3545;
-  color: white;
-}
-
-.cancel-button:hover {
-  background-color: #c82333;
+button[type="button"]:hover {
+  background-color: #c0392b;
 }
 </style>
