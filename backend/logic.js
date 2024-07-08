@@ -25,13 +25,11 @@ const readJsonFile = (filePath) => {
   });
 };
 
-// Define the path to the JSON file
 const filePath = path.join(__dirname, '../src/info/orders.json');
 
 // Variable to store extracted data
 let extractedData = null;
 
-// Extract data from JSON file
 const extractData = async () => {
   try {
     const jsonData = await readJsonFile(filePath);
@@ -115,7 +113,6 @@ extractData().then(() => {
       const response = await axios.post(statusUrl, { orderId });
       return response.data;
     }
-    
 
     // API endpoint to process order
     app.post('/place-order', async (req, res) => {
@@ -163,6 +160,23 @@ extractData().then(() => {
       } catch (error) {
         console.error('Error processing order:', error);
         res.status(500).json({ error: 'Failed to place order' });
+      }
+    });
+
+    // API endpoint to check order status
+    app.post('/status', async (req, res) => {
+      const { orderId, partner } = req.body;
+
+      if (!deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase())) {
+        return res.status(400).json({ message: 'Invalid delivery partner' });
+      }
+
+      try {
+        const partnerData = deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase());
+        const response = await checkOrderStatus(partnerData.endpoints.statusUrl, orderId);
+        res.json({ message: 'Status fetched successfully', status: response });
+      } catch (error) {
+        res.status(500).json({ message: 'Error fetching status', error: error.message });
       }
     });
 
