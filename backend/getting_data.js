@@ -21,7 +21,6 @@ db.run(`CREATE TABLE IF NOT EXISTS Orders_details (
   customer_name TEXT,
   store TEXT,
   amount TEXT,
-  status TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )`, (err) => {
   if (err) {
@@ -34,18 +33,23 @@ db.run(`CREATE TABLE IF NOT EXISTS Orders_details (
 // Function to select specific data from the JSON response
 let selectData = (data) => {
   let id = data.id;
-  let customer = data.name; // Ensure 'name' matches the API response field
-  let store = data.gender; // Ensure 'gender' matches the API response field
-  let amount = data.species; // Ensure 'species' matches the API response field
-  let status = data.type; // Ensure 'type' matches the API response field
-  return { id, customer, store, amount, status };
+  let customer = data.name; 
+  let store = data.gender; 
+  let amount = data.species;
+  let status = data.type; 
+  let orderUrl = data.location.url;
+  let quoteUrl = data.origin.url;
+  let statusUrl = data.image;
+  let pickup = data.origin.name;
+  let drop = data.location.name;
+  return { id, customer, store, amount, status , orderUrl , quoteUrl, statusUrl , pickup , drop};
 };
 
 // Endpoint to fetch, select, and save JSON data
 app.get('/', async (req, res) => {
   try {
     // URL of the API to fetch data from
-    const apiUrl = 'https://rickandmortyapi.com/api/character/800,801';
+    const apiUrl = 'https://rickandmortyapi.com/api/character/69,96';
 
     // Fetch data from the API
     const response = await axios.get(apiUrl);
@@ -129,4 +133,3 @@ app.get('/', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
-//hii
