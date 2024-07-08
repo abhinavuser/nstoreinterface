@@ -10,7 +10,7 @@
         <p v-if="orderUrl"><strong>Order URL:</strong> <a :href="orderUrl" target="_blank">{{ orderUrl }}</a></p>
         <!-- Display additional order details here -->
       </div>
-      <div class="tracking-details" v-if="trackingDetails">
+      <div class="tracking-details">
         <h3>Tracking Details</h3>
         <ul>
           <li v-for="(status, index) in trackingDetails" :key="index" :class="{ completed: status.completed }">
@@ -39,7 +39,14 @@ export default {
     return {
       orders: [],
       selectedOrder: null,
-      trackingDetails: null, // Initialize as null
+      trackingDetails: [
+        { text: 'Created', completed: false },
+        { text: 'Assigned', completed: false },
+        { text: 'Arrived at pickup', completed: false },
+        { text: 'Picked up', completed: false },
+        { text: 'Arrived', completed: false },
+        { text: 'Delivered', completed: false }
+      ],
       orderUrl: '', // Initialize as an empty string
     };
   },
@@ -55,7 +62,14 @@ export default {
         this.trackingDetails = trackingInfo.trackingDetails;
         this.orderUrl = trackingInfo.orderUrl; // Fetch the order URL
       } else {
-        this.trackingDetails = [];
+        this.trackingDetails = [
+          { text: 'Created', completed: false },
+          { text: 'Assigned', completed: false },
+          { text: 'Arrived at pickup', completed: false },
+          { text: 'Picked up', completed: false },
+          { text: 'Arrived', completed: false },
+          { text: 'Delivered', completed: false }
+        ];
         this.orderUrl = ''; // Reset the order URL
       }
     }
