@@ -132,6 +132,7 @@ export default {
           stores: this.stores,
           partners: this.partners,
         };
+        console.log('Updating data:', updatedData); // Log data being sent to server
         await fetch('http://localhost:3000/update', {
           method: 'POST',
           headers: {
@@ -157,6 +158,20 @@ export default {
     updateNavbarOptions() {
       this.navbarOptions.find(option => option.title === 'Store').subOptions = [...this.stores];
       this.navbarOptions.find(option => option.title === 'Logistics').subOptions = [...this.partners];
+    },
+    async updateDetails(updatedDetails) {
+      // Update details in stores or partners array
+      if (this.stores.some(store => store.name === updatedDetails.name)) {
+        const index = this.stores.findIndex(store => store.name === updatedDetails.name);
+        this.stores.splice(index, 1, updatedDetails);
+      } else if (this.partners.some(partner => partner.name === updatedDetails.name)) {
+        const index = this.partners.findIndex(partner => partner.name === updatedDetails.name);
+        this.partners.splice(index, 1, updatedDetails);
+      }
+
+      // Save updated data and update navbar options
+      await this.saveEntries();
+      this.updateNavbarOptions();
     },
   },
   async mounted() {

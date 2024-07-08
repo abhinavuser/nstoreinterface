@@ -61,18 +61,21 @@ export default {
 
 <style scoped>
 .store-page {
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-top: 20px;
+  padding: 30px;
+  margin: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 .store-details {
   margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ccc;
 }
 
 .details-item {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .edit-form {
@@ -80,11 +83,20 @@ export default {
 }
 
 .form-item {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.form-item input[type="text"], .form-item input[type="checkbox"] {
+  width: calc(100% - 10px); /* Adjusted width for input fields */
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .edit-button, button {
-  padding: 10px 15px;
+  padding: 12px 20px;
+  margin-right: 10px;
   background-color: #3498db;
   color: white;
   border: none;
@@ -98,7 +110,7 @@ export default {
 }
 
 button[type="submit"] {
-  margin-right: 10px;
+  background-color: #2ecc71;
 }
 
 button[type="button"] {
@@ -109,3 +121,4 @@ button[type="button"]:hover {
   background-color: #c0392b;
 }
 </style>
+

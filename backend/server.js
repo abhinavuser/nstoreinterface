@@ -33,6 +33,7 @@ app.get('/data', (req, res) => {
 
 app.post('/update', (req, res) => {
   const updatedData = req.body;
+  console.log('Received updated data:', updatedData); // Log received data
   fs.writeFile(dataFilePath, JSON.stringify(updatedData, null, 2), (err) => {
     if (err) {
       console.error('Error writing to data.json:', err);
