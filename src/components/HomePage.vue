@@ -12,7 +12,7 @@
                 <button type="submit">{{ option.title === 'Store' ? 'Add Store' : 'Add Logistics' }}</button>
               </form>
               <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
-                {{ subOption }}
+                {{ subOption.name }}
                 <button @click.stop="option.title === 'Store' ? deleteStore(subIndex) : deletePartner(subIndex)" class="delete-btn">
                   {{ option.title === 'Store' ? 'Delete Store' : 'Delete Logistics' }}
                 </button>
@@ -24,10 +24,10 @@
     </nav>
     <div v-if="selectedOption && selectedOption !== 'Home'">
       <h1>{{ selectedOption }} Page</h1>
-      <component :is="getComponentForOption(selectedOption)"></component>
+      <component :is="getComponentForOption(selectedOption)" :details="selectedOptionDetails"></component>
     </div>
-    <div v-else>
-      <component :is="getComponentForOption(selectedOption)"></component>
+    <div v-else-if="selectedOption === 'Home'">
+      <MainPage />
     </div>
   </div>
 </template>
@@ -59,11 +59,13 @@ export default {
         { title: "Logistics", open: false, subOptions: [] }
       ],
       selectedOption: null,
+      selectedOptionDetails: null,
     };
   },
   methods: {
     selectOption(option) {
       this.selectedOption = option;
+      this.selectedOptionDetails = null;
       this.closeAllDropdowns();
     },
     toggleDropdown(option) {
@@ -80,7 +82,8 @@ export default {
       }
     },
     selectDropdownOption(subOption) {
-      this.selectedOption = subOption;
+      this.selectedOption = subOption.name;
+      this.selectedOptionDetails = subOption;
       this.closeAllDropdowns();
     },
     closeAllDropdowns() {
@@ -93,13 +96,13 @@ export default {
     getComponentForOption(option) {
       if (option === "Home") return "MainPage";
       if (option === "Order") return "OrderPage";
-      if (this.stores.includes(option)) return "StorePage";
-      if (this.partners.includes(option)) return "PartnerPage";
+      if (this.stores.some(store => store.name === option)) return "StorePage";
+      if (this.partners.some(partner => partner.name === option)) return "PartnerPage";
       return null;
     },
     async addStore() {
       if (this.newEntry.trim() !== '') {
-        this.stores.push(this.newEntry.trim());
+        this.stores.push({ name: this.newEntry.trim(), hasDeliveryPartner: false });
         await this.saveEntries();
         this.updateNavbarOptions();
         this.newEntry = '';
@@ -112,7 +115,7 @@ export default {
     },
     async addPartner() {
       if (this.newEntry.trim() !== '') {
-        this.partners.push(this.newEntry.trim());
+        this.partners.push({ name: this.newEntry.trim(), location: '', amount: '' });
         await this.saveEntries();
         this.updateNavbarOptions();
         this.newEntry = '';
@@ -156,7 +159,7 @@ export default {
       this.navbarOptions.find(option => option.title === 'Logistics').subOptions = [...this.partners];
     },
   },
-  async created() {
+  async mounted() {
     await this.loadEntries();
   }
 };
@@ -206,7 +209,7 @@ ul {
   transition: background-color 0.3s ease;
 }
 
-dropbtn:hover {
+.dropbtn:hover {
   background-color: #2980b9;
 }
 
