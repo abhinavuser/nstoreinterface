@@ -2,7 +2,7 @@
   "stores": [
     {
       "name": "Store 1",
-      "hasDeliveryPartner": true
+      "hasDeliveryPartner": false
     },
     {
       "name": "Store 2",
@@ -10,7 +10,7 @@
     },
     {
       "name": "Store 3",
-      "hasDeliveryPartner": true
+      "hasDeliveryPartner": false
     }
   ],
   "partners": [

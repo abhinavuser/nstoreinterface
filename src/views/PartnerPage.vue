@@ -51,15 +51,15 @@ export default {
     };
   },
   computed: {
-    partnerTitle() {
-      return this.details ? this.details.name : 'Partner Page';
-    },
     partnerDetails() {
       return this.details;
     },
+    partnerTitle() {
+      return this.details ? this.details.name : 'Partner';
+    },
   },
   methods: {
-    async savePartnerDetails() {
+    savePartnerDetails() {
       this.editMode = false;
       this.$emit('update-details', this.editPartnerDetails);
     },

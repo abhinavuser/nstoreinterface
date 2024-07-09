@@ -24,7 +24,11 @@
     </nav>
     <div v-if="selectedOption && selectedOption !== 'Home'">
       <h1>{{ selectedOption }} Page</h1>
-      <component :is="getComponentForOption(selectedOption)" :details="selectedOptionDetails"></component>
+      <component 
+        :is="getComponentForOption(selectedOption)" 
+        :details="selectedOptionDetails"
+        @update-details="updateDetails"
+      ></component>
     </div>
     <div v-else-if="selectedOption === 'Home'">
       <MainPage />
@@ -127,16 +131,14 @@ export default {
       this.updateNavbarOptions();
     },
     async updateDetails(updatedDetails) {
-      // Update details in stores or partners array
       if (this.stores.some(store => store.name === updatedDetails.name)) {
         const index = this.stores.findIndex(store => store.name === updatedDetails.name);
-        this.$set(this.stores, index, updatedDetails); // Vue reactive update
+        this.stores[index] = { ...updatedDetails }; // Direct assignment in Vue 3
       } else if (this.partners.some(partner => partner.name === updatedDetails.name)) {
         const index = this.partners.findIndex(partner => partner.name === updatedDetails.name);
-        this.$set(this.partners, index, updatedDetails); // Vue reactive update
+        this.partners[index] = { ...updatedDetails }; // Direct assignment in Vue 3
       }
 
-      // Save updated data and update navbar options
       await this.saveEntries();
       this.updateNavbarOptions();
     },
@@ -146,7 +148,6 @@ export default {
           stores: this.stores,
           partners: this.partners,
         };
-        console.log('Updating data:', updatedData); // Log data being sent to server
         const response = await fetch('http://localhost:3000/update', {
           method: 'POST',
           headers: {
@@ -178,13 +179,19 @@ export default {
       }
     },
     updateNavbarOptions() {
-      // Update your navbarOptions with the updated stores and partners
-      this.navbarOptions.find(option => option.title === 'Store').subOptions = [...this.stores];
-      this.navbarOptions.find(option => option.title === 'Logistics').subOptions = [...this.partners];
-    },
+      const storeOption = this.navbarOptions.find(option => option.title === 'Store');
+      if (storeOption) {
+        storeOption.subOptions = this.stores;
+      }
+
+      const partnerOption = this.navbarOptions.find(option => option.title === 'Logistics');
+      if (partnerOption) {
+        partnerOption.subOptions = this.partners;
+      }
+    }
   },
-  async mounted() {
-    await this.loadEntries();
+  created() {
+    this.loadEntries();
   },
 };
 </script>
