@@ -68,6 +68,16 @@ const extractDataJsonDeliveryPartners = async () => {
   }
 };
 
+// Function to watch for changes in data.json
+const watchDataJsonChanges = () => {
+  fs.watch(dataFilePath, (event, filename) => {
+    if (filename) {
+      console.log(`Changes detected in ${filename}. Reloading delivery partners...`);
+      extractDataJsonDeliveryPartners();
+    }
+  });
+};
+
 // Mock function to simulate axios.post
 const mockAxiosPost = (url, data) => {
   return new Promise((resolve) => {
@@ -122,9 +132,11 @@ async function checkOrderStatus(statusUrl, orderId) {
 // Delivery partners configuration
 let deliveryPartners = [];
 
+// Function to initialize the server
 const initializeServer = async () => {
   await extractData();
   await extractDataJsonDeliveryPartners();
+  watchDataJsonChanges(); // Start watching data.json for changes
 
   if (extractedData && dataJsonDeliveryPartners.length > 0) {
     deliveryPartners = dataJsonDeliveryPartners.map(partnerName => ({
@@ -224,6 +236,7 @@ const initializeServer = async () => {
 
 initializeServer();
 
+
 /* For Real Time Api
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -252,17 +265,20 @@ const readJsonFile = (filePath) => {
   });
 };
 
-const filePath = path.join(__dirname, '../src/info/orders.json');
+const ordersFilePath = path.join(__dirname, '../src/info/orders.json');
+const dataFilePath = path.join(__dirname, '../src/info/data.json');
 
-// Variable to store extracted data
-let extractedData = null;
+// Variables to store extracted data
+let extractedOrderData = null;
+let deliveryPartners = [];
 
-const extractData = async () => {
+// Function to extract order data from orders.json
+const extractOrderData = async () => {
   try {
-    const jsonData = await readJsonFile(filePath);
+    const jsonData = await readJsonFile(ordersFilePath);
     const lastData = jsonData[jsonData.length - 1];
 
-    extractedData = {
+    extractedOrderData = {
       id: lastData.id,
       customer: lastData.customer,
       address: lastData.store,
@@ -273,9 +289,29 @@ const extractData = async () => {
       status: lastData.statusUrl
     };
 
-    console.log('Extracted Data:', extractedData);
+    console.log('Extracted Order Data:', extractedOrderData);
   } catch (error) {
-    console.error('Error reading or parsing JSON file:', error);
+    console.error('Error reading or parsing orders.json file:', error);
+  }
+};
+
+// Function to extract delivery partners from data.json
+const extractDeliveryPartners = async () => {
+  try {
+    const data = await readJsonFile(dataFilePath);
+    const partners = data.partners.map(partner => ({
+      name: partner.name,
+      endpoints: {
+        quoteUrl: partner.quoteUrl,
+        orderUrl: extractedOrderData ? extractedOrderData.order : null,
+        statusUrl: extractedOrderData ? extractedOrderData.status : null
+      }
+    }));
+
+    deliveryPartners = partners;
+    console.log('Delivery Partners updated from data.json:', deliveryPartners);
+  } catch (error) {
+    console.error('Error reading or parsing data.json file:', error);
   }
 };
 
@@ -300,122 +336,113 @@ async function checkOrderStatus(statusUrl, orderId) {
   return response.data;
 }
 
-// Delivery partners configuration
-let deliveryPartners = [];
+// Utility function to delay execution
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-extractData().then(() => {
-  if (extractedData) {
-    deliveryPartners = [
-      {
-        name: 'Dunzo',
-        endpoints: {
-          quoteUrl: 100,
-          orderUrl: extractedData.order,
-          statusUrl: extractedData.status
+// Function to get quotes from all delivery partners
+async function getQuotes(pickupLocation, dropLocation) {
+  const quotes = deliveryPartners.map(partner => ({
+    partner: partner.name,
+    quote: partner.endpoints.quoteUrl,
+    orderUrl: partner.endpoints.orderUrl,
+    statusUrl: partner.endpoints.statusUrl
+  }));
+  return quotes;
+}
+
+// API endpoint to process order
+app.post('/place-order', async (req, res) => {
+  const { id: orderId, pickup, drop } = extractedOrderData;
+  const customerData = extractedOrderData;
+
+  let bestQuote, deliveryUrl;
+
+  try {
+    while (true) {
+      console.log('Sending requests to delivery partners for quotes...');
+      const quotes = await getQuotes(pickup, drop);
+
+      console.log('Waiting for 3 minutes...');
+      await delay(3 * 60 * 1000); // Wait for 3 minutes
+
+      console.log('Checking quotes...');
+      bestQuote = quotes.reduce((prev, current) => (prev.quote < current.quote ? prev : current));
+
+      console.log(`Best quote from: ${bestQuote.partner} - $${bestQuote.quote}`);
+
+      console.log('Placing order with the best quote...');
+      const orderResponse = await placeOrder(bestQuote.orderUrl, customerData, orderId, pickup, drop);
+
+      if (orderResponse.success) {
+        deliveryUrl = orderResponse.deliveryUrl;
+
+        // Check order status
+        let statusResponse = await checkOrderStatus(bestQuote.statusUrl, orderId);
+
+        if (statusResponse.status === 'delivered') {
+          console.log('Order request delivered to partner successfully.');
+          res.json({ message: 'Order request delivered to partner successfully', deliveryUrl });
+          break;
+        } else if (statusResponse.status === 'cancelled') {
+          console.log('Order cancelled by delivery partner, retrying...');
+          continue;
         }
-      },
-      {
-        name: 'Shadowfax',
-        endpoints: {
-          quoteUrl: 150,
-          orderUrl: extractedData.order,
-          statusUrl: extractedData.status
-        }
-      },
-      {
-        name: 'Addlogs',
-        endpoints: {
-          quoteUrl: 80,
-          orderUrl: extractedData.order,
-          statusUrl: extractedData.status
-        }
+      } else {
+        throw new Error('Failed to place order with the selected partner');
       }
-    ];
-
-    // Utility function to delay execution
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-    // Function to get quotes from all delivery partners
-    async function getQuotes(pickupLocation, dropLocation) {
-      const quotes = deliveryPartners.map(partner => ({
-        partner: partner.name,
-        quote: partner.endpoints.quoteUrl,
-        orderUrl: partner.endpoints.orderUrl,
-        statusUrl: partner.endpoints.statusUrl
-      }));
-      return quotes;
     }
-
-    // API endpoint to process order
-    app.post('/place-order', async (req, res) => {
-      const { id: orderId, pickup, drop } = extractedData;
-      const customerData = extractedData;
-
-      let bestQuote, deliveryUrl;
-
-      try {
-        while (true) {
-          console.log('Sending requests to delivery partners for quotes...');
-          const quotes = await getQuotes(pickup, drop);
-
-          console.log('Waiting for 3 minutes...');
-          await delay(3 * 60 * 1000); // Wait for 3 minutes
-
-          console.log('Checking quotes...');
-          bestQuote = quotes.reduce((prev, current) => (prev.quote < current.quote ? prev : current));
-
-          console.log(`Best quote from: ${bestQuote.partner} - $${bestQuote.quote}`);
-
-          console.log('Placing order with the best quote...');
-          const orderResponse = await placeOrder(bestQuote.orderUrl, customerData, orderId, pickup, drop);
-
-          if (orderResponse.success) {
-            deliveryUrl = orderResponse.deliveryUrl;
-
-            // Check order status
-            let statusResponse = await checkOrderStatus(bestQuote.statusUrl, orderId);
-
-            if (statusResponse.status === 'delivered') {
-              console.log('Order delivered successfully.');
-              res.json({ message: 'Order delivered successfully', deliveryUrl });
-              break;
-            } else if (statusResponse.status === 'cancelled') {
-              console.log('Order cancelled by delivery partner, retrying...');
-              continue;
-            }
-          } else {
-            throw new Error('Failed to place order with the selected partner');
-          }
-        }
-      } catch (error) {
-        console.error('Error processing order:', error);
-        res.status(500).json({ error: 'Failed to place order' });
-      }
-    });
-
-    // API endpoint to check order status
-    app.post('/status', async (req, res) => {
-      const { orderId, partner } = req.body;
-
-      if (!deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase())) {
-        return res.status(400).json({ message: 'Invalid delivery partner' });
-      }
-
-      try {
-        const partnerData = deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase());
-        const response = await checkOrderStatus(partnerData.endpoints.statusUrl, orderId);
-        res.json({ message: 'Status fetched successfully', status: response });
-      } catch (error) {
-        res.status(500).json({ message: 'Error fetching status', error: error.message });
-      }
-    });
-
-    app.listen(4000, () => {
-      console.log('Server is running on port 4000');
-    });
-  } else {
-    console.error('Failed to extract data. Server not started.');
+  } catch (error) {
+    console.error('Error processing order:', error);
+    res.status(500).json({ error: 'Failed to place order' });
   }
 });
+
+// API endpoint to check order status
+app.post('/status', async (req, res) => {
+  const { orderId, partner } = req.body;
+
+  if (!deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase())) {
+    return res.status(400).json({ message: 'Invalid delivery partner' });
+  }
+
+  try {
+    const partnerData = deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase());
+    const response = await checkOrderStatus(partnerData.endpoints.statusUrl, orderId);
+    res.json({ message: 'Status fetched successfully', status: response });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching status', error: error.message });
+  }
+});
+
+// Function to watch for changes in orders.json and data.json
+const watchFilesForChanges = () => {
+  fs.watch(ordersFilePath, (event, filename) => {
+    if (filename) {
+      console.log(`Changes detected in ${filename}. Reloading order data...`);
+      extractOrderData();
+    }
+  });
+
+  fs.watch(dataFilePath, (event, filename) => {
+    if (filename) {
+      console.log(`Changes detected in ${filename}. Reloading delivery partners...`);
+      extractDeliveryPartners();
+    }
+  });
+};
+
+// Function to initialize server and start watching files
+const initializeServer = async () => {
+  await extractOrderData();
+  await extractDeliveryPartners();
+  watchFilesForChanges(); // Start watching files for changes
+
+  app.listen(4000, () => {
+    console.log('Server is running on port 4000');
+  });
+};
+
+initializeServer();
+
 */
 
