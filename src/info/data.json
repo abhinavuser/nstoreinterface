@@ -10,7 +10,7 @@
     },
     {
       "name": "Store 3",
-      "hasDeliveryPartner": false
+      "hasDeliveryPartner": true
     }
   ],
   "partners": [
