@@ -179,8 +179,8 @@ extractData().then(() => {
             let statusResponse = await checkOrderStatus(bestQuote.statusUrl, orderId);
 
             if (statusResponse.status === 'delivered') {
-              console.log('Order delivered successfully.');
-              res.json({ message: 'Order delivered successfully', deliveryUrl });
+              console.log('Order request delivered to partner successfully.');
+              res.json({ message: 'Order request delivered to partner successfully', deliveryUrl });
               break;
             } else if (statusResponse.status === 'cancelled') {
               console.log('Order cancelled by delivery partner, retrying...');
