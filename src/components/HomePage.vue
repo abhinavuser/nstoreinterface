@@ -280,6 +280,7 @@ ul {
   padding: 10px 15px;
   text-decoration: none;
   transition: background-color 0.3s ease, color 0.3s ease;
+  color: black;
 }
 
 .dropdown-content .nav-link:hover {
