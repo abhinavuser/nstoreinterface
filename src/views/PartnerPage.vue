@@ -15,7 +15,7 @@
         <label>Amount:</label>
         <span>{{ partnerDetails.amount }}</span>
       </div>
-      <button class="edit-button" @click="editMode = true">Edit</button>
+      <button class="edit-button" @click="editMode = !editMode">Edit</button>
     </div>
     <div class="edit-form" v-if="editMode">
       <h3>Edit Partner Details</h3>
@@ -55,11 +55,11 @@ export default {
       return this.details;
     },
     partnerTitle() {
-      return this.details ? this.details.name : 'Partner';
+      return this.details ? this.details.name : 'Partner Page';
     },
   },
   methods: {
-    savePartnerDetails() {
+    async savePartnerDetails() {
       this.editMode = false;
       this.$emit('update-details', this.editPartnerDetails);
     },

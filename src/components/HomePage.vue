@@ -131,12 +131,13 @@ export default {
       this.updateNavbarOptions();
     },
     async updateDetails(updatedDetails) {
-      if (this.stores.some(store => store.name === updatedDetails.name)) {
-        const index = this.stores.findIndex(store => store.name === updatedDetails.name);
-        this.stores[index] = { ...updatedDetails }; // Direct assignment in Vue 3
-      } else if (this.partners.some(partner => partner.name === updatedDetails.name)) {
-        const index = this.partners.findIndex(partner => partner.name === updatedDetails.name);
-        this.partners[index] = { ...updatedDetails }; // Direct assignment in Vue 3
+      const storeIndex = this.stores.findIndex(store => store.name === this.selectedOption);
+      const partnerIndex = this.partners.findIndex(partner => partner.name === this.selectedOption);
+
+      if (storeIndex !== -1) {
+        this.stores[storeIndex] = { ...updatedDetails };
+      } else if (partnerIndex !== -1) {
+        this.partners[partnerIndex] = { ...updatedDetails };
       }
 
       await this.saveEntries();

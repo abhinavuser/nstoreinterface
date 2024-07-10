@@ -11,6 +11,7 @@ app.use(cors({
   origin: 'http://localhost:8080', // Allow requests from localhost:8080
 }));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const dataFilePath = path.join(__dirname, '../src/info/data.json');
 
@@ -19,6 +20,7 @@ app.get('/data', (req, res) => {
     if (err) {
       console.error('Error reading data.json:', err);
       res.status(500).send({ message: 'Error reading data.json', error: err });
+      return;
     } else {
       try {
         const jsonData = JSON.parse(data);
@@ -38,6 +40,7 @@ app.post('/update', (req, res) => {
     if (err) {
       console.error('Error writing to data.json:', err);
       res.status(500).send({ message: 'Error writing to data.json', error: err });
+      return;
     } else {
       res.send({ message: 'Data updated successfully' });
     }

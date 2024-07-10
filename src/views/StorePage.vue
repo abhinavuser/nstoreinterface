@@ -11,7 +11,7 @@
         <label>Has Delivery Partner:</label>
         <span>{{ storeDetails.hasDeliveryPartner ? 'Yes' : 'No' }}</span>
       </div>
-      <button class="edit-button" @click="editMode = true">Edit</button>
+      <button class="edit-button" @click="editMode = !editMode">Edit</button>
     </div>
     <div class="edit-form" v-if="editMode">
       <h3>Edit Store Details</h3>
