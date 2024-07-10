@@ -1,17 +1,18 @@
 <template>
   <div>
-    <nav>
+    <nav :class="[isDarkTheme ? 'navbar-dark' : 'navbar-light']">
       <ul>
+        <a class="navbar-brand" href="#">nStore</a>
         <li v-for="(option, index) in navbarOptions" :key="index" class="nav-item">
-          <a v-if="typeof option === 'string'" @click="selectOption(option)" class="nav-link">{{ option }}</a>
+          <a v-if="typeof option === 'string'" @click="selectOption(option)" :class="['nav-link', isDarkTheme ? 'text-light' : 'text-dark']">{{ option }}</a>
           <div v-else class="dropdown">
-            <button @click="toggleDropdown(option)" class="dropbtn">{{ option.title }}</button>
+            <button @click="toggleDropdown(option)" :class="['dropbtn', isDarkTheme ? 'text-light' : 'text-dark']">{{ option.title }}</button>
             <div v-show="option.open" class="dropdown-content">
               <form @submit.prevent="option.title === 'Store' ? addStore() : addPartner()">
                 <input v-model="newEntry" :placeholder="'Enter new ' + option.title.toLowerCase()" />
                 <button type="submit">{{ option.title === 'Store' ? 'Add Store' : 'Add Logistics' }}</button>
               </form>
-              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" class="nav-link">
+              <a v-for="(subOption, subIndex) in option.subOptions" :key="subIndex" @click="selectDropdownOption(subOption)" :class="['nav-link', isDarkTheme ? 'text-light' : 'text-dark']">
                 {{ subOption.name }}
                 <button @click.stop="option.title === 'Store' ? deleteStore(subIndex) : deletePartner(subIndex)" class="delete-btn">
                   {{ option.title === 'Store' ? 'Delete Store' : 'Delete Logistics' }}
@@ -20,6 +21,7 @@
             </div>
           </div>
         </li>
+        <button @click="toggleTheme" class="theme-toggle-btn">Change Theme</button>
       </ul>
     </nav>
     <div v-if="selectedOption && selectedOption !== 'Home'">
@@ -64,9 +66,13 @@ export default {
       ],
       selectedOption: null,
       selectedOptionDetails: null,
+      isDarkTheme: true,
     };
   },
   methods: {
+    toggleTheme() {
+      this.isDarkTheme = !this.isDarkTheme;
+    },
     selectOption(option) {
       this.selectedOption = option;
       this.selectedOptionDetails = null;
@@ -198,8 +204,13 @@ export default {
 </script>
 
 <style scoped>
-nav {
+nav.navbar-dark {
   background-color: #333;
+  padding: 10px 20px;
+}
+
+nav.navbar-light {
+  background-color: #f8f9fa;
   padding: 10px 20px;
 }
 
@@ -214,8 +225,15 @@ ul {
   margin-right: 20px;
 }
 
-.nav-link {
+.nav-link.text-light {
   color: #fff;
+}
+
+.nav-link.text-dark {
+  color: #000;
+}
+
+.nav-link {
   text-decoration: none;
   padding: 10px 15px;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -233,12 +251,13 @@ ul {
 
 .dropbtn {
   background-color: #3498db;
-  color: white;
-  padding: 10px 15px;
+  padding: 0.5rem 1rem;
   font-size: 16px;
   border: none;
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  color: white;
 }
 
 .dropbtn:hover {
@@ -259,7 +278,6 @@ ul {
   display: flex;
   justify-content: space-between;
   padding: 10px 15px;
-  color: black;
   text-decoration: none;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -317,5 +335,36 @@ ul {
 .dropdown .dropbtn:focus + .dropdown-content,
 .dropdown-content:hover {
   display: block;
+}
+
+.theme-toggle-btn {
+  padding: 0.5rem 1rem;
+  font-size: 15px;
+  margin-left: 25%;
+  cursor: pointer;
+  border: none;
+  background-color: #3498db;
+  color: white;
+  border-radius: 4px;
+}
+
+.theme-toggle-btn:hover {
+  background-color: #2980b9;
+}
+
+.navbar-brand {
+  color: var(--link-active-color);
+  font-weight: bold;
+  background-image: linear-gradient(to top, lightblue 0%, #3498db 100%);
+  background-size: 100%;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+  margin-right: 30%;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1.5rem;
 }
 </style>
