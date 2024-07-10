@@ -26,10 +26,15 @@ const readJsonFile = (filePath) => {
 };
 
 const filePath = path.join(__dirname, '../src/info/orders.json');
+const dataFilePath = path.join(__dirname, '../src/info/data.json'); // Path to data.json
 
 // Variable to store extracted data
 let extractedData = null;
 
+// Variable to store delivery partners from data.json
+let dataJsonDeliveryPartners = [];
+
+// Function to extract data from orders.json
 const extractData = async () => {
   try {
     const jsonData = await readJsonFile(filePath);
@@ -49,6 +54,17 @@ const extractData = async () => {
     console.log('Extracted Data:', extractedData);
   } catch (error) {
     console.error('Error reading or parsing JSON file:', error);
+  }
+};
+
+// Function to read delivery partners from data.json
+const extractDataJsonDeliveryPartners = async () => {
+  try {
+    const data = await readJsonFile(dataFilePath);
+    dataJsonDeliveryPartners = data.partners.map(partner => partner.name);
+    console.log('Delivery Partners from data.json:', dataJsonDeliveryPartners);
+  } catch (error) {
+    console.error('Error reading or parsing data.json file:', error);
   }
 };
 
@@ -106,34 +122,19 @@ async function checkOrderStatus(statusUrl, orderId) {
 // Delivery partners configuration
 let deliveryPartners = [];
 
-extractData().then(() => {
-  if (extractedData) {
-    deliveryPartners = [
-      {
-        name: 'Dunzo',
-        endpoints: {
-          quoteUrl: 100,
-          orderUrl: extractedData.order,
-          statusUrl: extractedData.status
-        }
-      },
-      {
-        name: 'Shadowfax',
-        endpoints: {
-          quoteUrl: 150,
-          orderUrl: extractedData.order,
-          statusUrl: extractedData.status
-        }
-      },
-      {
-        name: 'Addlogs',
-        endpoints: {
-          quoteUrl: 80,
-          orderUrl: extractedData.order,
-          statusUrl: extractedData.status
-        }
+const initializeServer = async () => {
+  await extractData();
+  await extractDataJsonDeliveryPartners();
+
+  if (extractedData && dataJsonDeliveryPartners.length > 0) {
+    deliveryPartners = dataJsonDeliveryPartners.map(partnerName => ({
+      name: partnerName,
+      endpoints: {
+        quoteUrl: Math.floor(Math.random() * 200), // Random quote for demonstration
+        orderUrl: extractedData.order,
+        statusUrl: extractedData.status
       }
-    ];
+    }));
 
     // Utility function to delay execution
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -162,7 +163,7 @@ extractData().then(() => {
           const quotes = await getQuotes(pickup, drop);
 
           console.log('Waiting for 3 minutes...');
-          await delay(3 * 60 * 1000); // Wait for 3 minutes (3 * 60 * 1000 ms)
+          await delay(3 * 1000); // Wait for 3 minutes (3 * 60 * 1000 ms)
 
           console.log('Checking quotes...');
           bestQuote = quotes.reduce((prev, current) => (prev.quote < current.quote ? prev : current));
@@ -180,7 +181,7 @@ extractData().then(() => {
 
             if (statusResponse.status === 'delivered') {
               console.log('Order request delivered to partner successfully.');
-              res.json({ message: 'Order request delivered to partner successfully', deliveryUrl });
+              res.json({ message: 'Order request delivered to partner successfully.', deliveryUrl });
               break;
             } else if (statusResponse.status === 'cancelled') {
               console.log('Order cancelled by delivery partner, retrying...');
@@ -217,9 +218,12 @@ extractData().then(() => {
       console.log('Server is running on port 4000');
     });
   } else {
-    console.error('Failed to extract data. Server not started.');
+    console.error('Failed to extract data or delivery partners. Server not started.');
   }
-});
+};
+
+initializeServer();
+
 /* For Real Time Api
 const express = require('express');
 const bodyParser = require('body-parser');
