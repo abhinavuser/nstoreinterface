@@ -1,3 +1,143 @@
+//For MOCK API 
+const express = require('express');
+const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
+
+const app = express();
+const port = 8000;
+const path = require('path'); // Import the 'path' module
+
+// Connect to SQLite database
+const db = new sqlite3.Database("../src/info/data.sqlite", (err) => {
+  if (err) {
+    console.error('Error connecting to database', err.message);
+  } else {
+    console.log('Connected to the SQLite database.');
+  }
+});
+
+// Create table if not exists
+db.run(`CREATE TABLE IF NOT EXISTS Orders_details (
+  id INTEGER PRIMARY KEY UNIQUE,
+  customer_name TEXT,
+  store TEXT,
+  amount TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`, (err) => {
+  if (err) {
+    console.error('Error creating table:', err.message);
+  } else {
+    console.log('Table created successfully.');
+  }
+});
+
+// Function to select specific data from the JSON response
+let selectData = (data) => {
+  let id = data.id;
+  let customer = data.customer;
+  let store = data.store;
+  let amount = data.amount;
+  let status = data.status;
+  let orderUrl = data.orderUrl;
+  let quoteUrl = data.quoteUrl;
+  let statusUrl = data.statusUrl;
+  let pickup = data.pickup;
+  let drop = data.drop;
+  return { id, customer, store, amount, status , orderUrl , quoteUrl, statusUrl , pickup , drop };
+};
+
+// Endpoint to fetch, select, and save JSON data
+app.get('/', async (req, res) => {
+  try {
+    // Path to mock data JSON file
+    const mockDataFilePath = path.join(__dirname, 'mock_data.json');
+
+    // Read mock data from JSON file
+    fs.readFile(mockDataFilePath, 'utf8', (err, fileData) => {
+      if (err) {
+        console.error('Error reading mock data file:', err.message);
+        res.status(500).json({ error: 'Failed to read mock data' });
+        return;
+      }
+
+      try {
+        const data = JSON.parse(fileData);
+
+        // Map and select specific data
+        const selectedData = data.map(item => selectData(item));
+
+        // Insert data into SQLite database
+        selectedData.forEach((data) => {
+          db.run(`INSERT INTO Orders_details (id, customer_name, store, amount, status) VALUES (?, ?, ?, ?, ?)`,
+            [data.id, data.customer, data.store, data.amount, data.status],
+            function(err) {
+              if (err) {
+                console.error('Error inserting data:', err.message);
+              } else {
+                console.log('Data inserted successfully');
+              }
+            });
+        });
+
+        // Path to the output JSON file
+        const outputFilePath = "../src/info/orders.json";
+
+        // Read the existing data from the JSON file
+        fs.readFile(outputFilePath, 'utf8', (err, fileData) => {
+          let jsonData = []; // Initialize jsonData as an empty array
+
+          if (err) {
+            if (err.code !== 'ENOENT') {
+              console.error('Error reading the file:', err.message);
+              res.status(500).json({ error: 'Failed to read the data file' });
+              return;
+            }
+          } else {
+            try {
+              // Parse the existing data to a JavaScript array if the file exists
+              jsonData = JSON.parse(fileData);
+            } catch (parseErr) {
+              console.error('Error parsing JSON data:', parseErr.message);
+              res.status(500).json({ error: 'Failed to parse the data file' });
+              return;
+            }
+          }
+
+          // Append the new data to the array
+          jsonData = jsonData.concat(selectedData);
+
+          // Convert the updated object back to a JSON string
+          const updatedData = JSON.stringify(jsonData, null, 2);
+
+          // Write the updated JSON string back to the file
+          fs.writeFile(outputFilePath, updatedData, 'utf8', (writeErr) => {
+            if (writeErr) {
+              console.error('Error writing the file:', writeErr.message);
+              res.status(500).json({ error: 'Failed to write the data file' });
+              return;
+            }
+            console.log('Data appended successfully:', selectedData);
+            res.json({ message: 'Data fetched, selected, and appended successfully' });
+          });
+        });
+      } catch (parseErr) {
+        console.error('Error parsing JSON data:', parseErr.message);
+        res.status(500).json({ error: 'Failed to parse mock data' });
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching or processing data:', error);
+    res.status(500).json({ error: 'Failed to fetch or process data' });
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
+
+
+/* FOR REAL API 
 const express = require('express');
 const axios = require('axios');
 const fs = require('fs');
@@ -5,6 +145,7 @@ const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const port = 8000;
+const path = require('path'); // Import the 'path' module
 
 // Connect to SQLite database
 const db = new sqlite3.Database("../src/info/data.sqlite", (err) => {
@@ -133,3 +274,4 @@ app.get('/', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+*/
