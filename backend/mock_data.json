@@ -50,7 +50,7 @@
       {
         "id": 5,
         "customer": "Jacob",
-        "store": "Store 2",
+        "store": "Store 3",
         "amount": "200",
         "status": "Completed",
         "orderUrl": "https://example.com/orders/3",
