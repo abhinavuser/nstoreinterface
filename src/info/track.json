@@ -27,7 +27,7 @@
         "completed": false
       }
     ],
-    "orderUrl": "https://example.com/order/69"
+    "orderUrl": "https://example.com/orders/1"
   },
   {
     "orderId": 2,
@@ -42,7 +42,7 @@
       },
       {
         "text": "Arrived at pickup",
-        "completed": true
+        "completed": false
       },
       {
         "text": "Picked up",
@@ -57,7 +57,7 @@
         "completed": false
       }
     ],
-    "orderUrl": "https://example.com/order/96"
+    "orderUrl": "https://example.com/orders/2"
   },
   {
     "orderId": 3,
@@ -72,7 +72,7 @@
       },
       {
         "text": "Arrived at pickup",
-        "completed": false
+        "completed": true
       },
       {
         "text": "Picked up",
@@ -87,7 +87,7 @@
         "completed": false
       }
     ],
-    "orderUrl": "https://example.com/order/68"
+    "orderUrl": "https://example.com/orders/3"
   },
   {
     "orderId": 4,
@@ -102,7 +102,7 @@
       },
       {
         "text": "Arrived at pickup",
-        "completed": true
+        "completed": false
       },
       {
         "text": "Picked up",
@@ -117,7 +117,7 @@
         "completed": false
       }
     ],
-    "orderUrl": "https://example.com/order/86"
+    "orderUrl": "https://example.com/orders/3"
   },
   {
     "orderId": 5,
@@ -132,7 +132,7 @@
       },
       {
         "text": "Arrived at pickup",
-        "completed": true
+        "completed": false
       },
       {
         "text": "Picked up",
@@ -147,36 +147,6 @@
         "completed": false
       }
     ],
-    "orderUrl": "https://mock.delivery.url"
-  },
-  {
-    "orderId": 6,
-    "trackingDetails": [
-      {
-        "text": "Created",
-        "completed": true
-      },
-      {
-        "text": "Assigned",
-        "completed": true
-      },
-      {
-        "text": "Arrived at pickup",
-        "completed": true
-      },
-      {
-        "text": "Picked up",
-        "completed": false
-      },
-      {
-        "text": "Arrived",
-        "completed": false
-      },
-      {
-        "text": "Delivered",
-        "completed": false
-      }
-    ],
-    "orderUrl": "https://mock.delivery.url"
+    "orderUrl": "https://example.com/orders/3"
   }
 ]

@@ -139,49 +139,54 @@ async function checkOrderStatus(statusUrl, orderId) {
 }
 
 // Function to append order ID and delivery URL to track.json
-const appendToTrack = async (orderId, deliveryUrl) => {
+const appendToTrack = async () => {
   try {
+    // Read all entries from orders.json
+    const ordersData = await readJsonFile(ordersFilePath);
+
+    // Read existing track.json content
     let trackData = [];
     if (fs.existsSync(trackFilePath)) {
       const trackJson = await readJsonFile(trackFilePath);
       trackData = trackJson;
     }
 
-    // Randomize the 'completed' parameter for "Arrived at pickup"
-    const arrivedAtPickupCompleted = Math.random() < 0.5; // 50% chance of being true or false
+    // Function to check if an orderId already exists in trackData
+    const isDuplicateOrder = (orderId) => {
+      return trackData.some(entry => entry.orderId === orderId);
+    };
 
-    trackData.push({ orderId, "trackingDetails": [
-      {
-        "text": "Created",
-        "completed": true
-      },
-      {
-        "text": "Assigned",
-        "completed": true
-      },
-      {
-        "text": "Arrived at pickup",
-        "completed": arrivedAtPickupCompleted  // Randomized true or false
-      },
-      {
-        "text": "Picked up",
-        "completed": false
-      },
-      {
-        "text": "Arrived",
-        "completed": false
-      },
-      {
-        "text": "Delivered",
-        "completed": false
+    // Append new orders to trackData (one at a time, avoiding duplicates)
+    for (const order of ordersData) {
+      if (!isDuplicateOrder(order.id)) {
+        const arrivedAtPickupCompleted = Math.random() < 0.5; // Randomized 'Arrived at pickup' status
+        trackData.push({
+          orderId: order.id,
+          trackingDetails: [
+            { text: "Created", completed: true },
+            { text: "Assigned", completed: true },
+            { text: "Arrived at pickup", completed: arrivedAtPickupCompleted },
+            { text: "Picked up", completed: false },
+            { text: "Arrived", completed: false },
+            { text: "Delivered", completed: false }
+          ],
+          orderUrl: order.orderUrl
+        });
+
+        // Write updated trackData back to track.json after each append
+        fs.writeFileSync(trackFilePath, JSON.stringify(trackData, null, 2));
+        console.log(`Appended order ${order.id} to track.json`);
+      } else {
+        console.log(`Order ${order.id} already exists in track.json. Skipping.`);
       }
-    ], orderUrl: deliveryUrl });
-    fs.writeFileSync(trackFilePath, JSON.stringify(trackData, null, 2));
-    console.log('Appended to track.json:', { orderId, orderUrl: deliveryUrl });
+    }
+
+    console.log('Finished appending orders to track.json');
   } catch (error) {
     console.error('Error appending to track.json:', error);
   }
 };
+
 // Delivery partners configuration
 let deliveryPartners = [];
 
@@ -272,9 +277,13 @@ app.post('/status', async (req, res) => {
   res.status(404).json({ message: 'This endpoint is not accessible directly. Please use the /place-order endpoint.' });
 });
 
+// Run the entire server initialization process every 10 seconds
+setInterval(initializeServer, 15000);
+
 app.listen(4000, () => {
   console.log('Server is running on port 4000');
 });
+
 
 
 
