@@ -222,6 +222,10 @@ const updateOrderStatus = async () => {
           order.status = 'Completed';
           ordersUpdated = true;
         }
+        else if (order.status == 'Completed'){
+          order.status = 'Completed';
+          ordersUpdated = true;
+        }
         else{
             order.status = 'Failed';
             ordersUpdated = true;
