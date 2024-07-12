@@ -1,102 +1,82 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
-
 const app = express();
 const port = 3000;
 
+// Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Load orders from orders.json
-const ordersFilePath = path.join(__dirname, 'orders.json');
-let orders = [];
-let currentOrder = {};
+// Mock tracking details object
+let trackingDetails = [
+  { text: "Created", completed: true },
+  { text: "Assigned", completed: Math.random() < 0.5 }, // Random true or false for Assigned initially
+  { text: "Arrived at pickup", completed: false },
+  { text: "Picked up", completed: false },
+  { text: "Arrived", completed: false },
+  { text: "Delivered", completed: false }
+];
 
-if (fs.existsSync(ordersFilePath)) {
-  const ordersData = fs.readFileSync(ordersFilePath);
-  orders = JSON.parse(ordersData);
-
-  if (orders.length > 0) {
-    currentOrder = orders[orders.length - 1];
-  }
-}
-
-// Save orders to orders.json
-function saveOrders() {
-  fs.writeFileSync(ordersFilePath, JSON.stringify(orders, null, 2));
-}
-
-// Endpoint to handle webhook notifications
+// Endpoint to receive webhook updates
 app.post('/webhook', (req, res) => {
-  const { orderId, status } = req.body;
+  const webhookData = req.body; // Assuming the webhook sends JSON data
 
-  const orderIndex = orders.findIndex(order => order.id === orderId);
-  if (orderIndex !== -1) {
-    orders[orderIndex].status = status;
-    console.log(`Webhook received for order ${orderId} with status ${status}`);
-    saveOrders();
-    res.status(200).json({ message: 'Webhook received successfully' });
-  } else {
-    res.status(404).json({ message: 'Order not found' });
+  // Update your trackingDetails based on webhookData
+  // Example: updating 'Picked up' status
+  if (webhookData.event === 'picked_up') {
+    trackingDetails.find(detail => detail.text === 'Picked up').completed = true;
   }
+
+  // Respond with a success message
+  res.status(200).send('Webhook received successfully');
 });
 
-// Endpoint to place a new order
-app.post('/place-order', (req, res) => {
-  const newOrder = {
-    id: req.body.id, // assuming id is provided in the request body
-    status: 'Processing',
-    details: req.body.details
-  };
+// Endpoint to mock API for generating random statuses
+app.get('/mockStatus', (req, res) => {
+  // Update Assigned status randomly
+  trackingDetails[1].completed = Math.random() < 1;
 
-  orders.push(newOrder);
-  currentOrder = newOrder;
-  saveOrders();
+  // Update statuses based on Assigned value
+  if (trackingDetails[1].completed) {
+    // If Assigned is true, update Arrived at pickup, Picked up, Arrived, Delivered randomly
+    trackingDetails[2].completed = Math.random() < 0.9;
 
-  // Simulate order status changes
-  simulateOrderStatusChange(newOrder.id);
+    if (trackingDetails[2].completed){
+      trackingDetails[3].completed = Math.random() < 0.8
 
-  res.json({ message: 'Order placed successfully', orderId: newOrder.id });
-});
+      if (trackingDetails[3].completed){
+        trackingDetails[4].completed = Math.random() < 0.8;
 
-// Endpoint to get the status of an order
-app.get('/order-status/:orderId', (req, res) => {
-  const orderId = parseInt(req.params.orderId, 10);
-  const order = orders.find(order => order.id === orderId);
+        if (trackingDetails[4].completed){
+          trackingDetails[5].completed = Math.random() < 0.9;
+        }else{
+          trackingDetails[5].completed = false;
+        }
 
-  if (order) {
-    res.json({ orderId: orderId, status: order.status });
+
+      }else{
+        trackingDetails[4].completed = false;
+        trackingDetails[5].completed = false;
+
+      }
+
+    }else{
+      trackingDetails[3].completed = false;
+      trackingDetails[4].completed = false;
+      trackingDetails[5].completed = false;
+    }
+
   } else {
-    res.status(404).json({ message: 'Order not found' });
+    // If Assigned is false, set all statuses below Assigned to false
+    trackingDetails[2].completed = false;
+    trackingDetails[3].completed = false;
+    trackingDetails[4].completed = false;
+    trackingDetails[5].completed = false;
   }
+
+  res.json(trackingDetails);
 });
-
-// Simulate order status changes
-function simulateOrderStatusChange(orderId) {
-  setTimeout(() => {
-    notifyWebhook(orderId, 'Shipped');
-  }, 120000); // 2 minutes
-
-  setTimeout(() => {
-    notifyWebhook(orderId, 'Delivered');
-  }, 240000); // 4 minutes
-}
-
-// Notify webhook about order status change
-function notifyWebhook(orderId, status) {
-  axios.post('http://localhost:3000/webhook', {
-    orderId: orderId,
-    status: status
-  }).then(response => {
-    console.log(`Webhook notified for order ${orderId} with status ${status}`);
-  }).catch(error => {
-    console.error(`Error notifying webhook for order ${orderId}: ${error.message}`);
-  });
-}
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

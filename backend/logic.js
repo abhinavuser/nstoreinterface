@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,6 +21,19 @@ const readJsonFile = (filePath) => {
         } catch (parseErr) {
           reject(parseErr);
         }
+      }
+    });
+  });
+};
+
+// Function to write JSON file
+const writeJsonFile = (filePath, data) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
       }
     });
   });
@@ -139,11 +153,12 @@ async function checkOrderStatus(statusUrl, orderId) {
 }
 
 // Function to append order ID and delivery URL to track.json
-const appendToTrack = async () => {
+const appendToTrack = async (orderId, deliveryUrl) => {
   try {
-    // Read all entries from orders.json
+    // Make a GET request to /mockStatus to fetch updated tracking details
     const ordersData = await readJsonFile(ordersFilePath);
 
+    // Assuming this is how your mockStatus endpoint responds
     // Read existing track.json content
     let trackData = [];
     if (fs.existsSync(trackFilePath)) {
@@ -156,34 +171,73 @@ const appendToTrack = async () => {
       return trackData.some(entry => entry.orderId === orderId);
     };
 
-    // Append new orders to trackData (one at a time, avoiding duplicates)
+    // Append new order to trackData if it's not a duplicate
     for (const order of ordersData) {
-      if (!isDuplicateOrder(order.id)) {
-        const arrivedAtPickupCompleted = Math.random() < 0.5; // Randomized 'Arrived at pickup' status
+      const response = await axios.get('http://localhost:3000/mockStatus');
+      const webhookTrackingDetails = response.data;
+      if (!isDuplicateOrder(orderId)) {
         trackData.push({
           orderId: order.id,
-          trackingDetails: [
-            { text: "Created", completed: true },
-            { text: "Assigned", completed: true },
-            { text: "Arrived at pickup", completed: arrivedAtPickupCompleted },
-            { text: "Picked up", completed: false },
-            { text: "Arrived", completed: false },
-            { text: "Delivered", completed: false }
-          ],
+          trackingDetails: webhookTrackingDetails,
           orderUrl: order.orderUrl
         });
 
-        // Write updated trackData back to track.json after each append
+        // Write updated trackData back to track.json
         fs.writeFileSync(trackFilePath, JSON.stringify(trackData, null, 2));
-        console.log(`Appended order ${order.id} to track.json`);
+        console.log(`Appended order ${orderId} to track.json with webhook tracking details`);
       } else {
-        console.log(`Order ${order.id} already exists in track.json. Skipping.`);
+        console.log(`Order ${orderId} already exists in track.json. Skipping.`);
       }
     }
 
     console.log('Finished appending orders to track.json');
   } catch (error) {
     console.error('Error appending to track.json:', error);
+  }
+};
+
+// Function to check if all tracking details are completed
+const areAllTrackingDetailsCompleted = (trackingDetails) => {
+  return trackingDetails.every(detail => detail.completed);
+};
+
+// Function to update order status to "Completed"
+const updateOrderStatus = async () => {
+  try {
+    // Read the track.json file
+    const trackData = await readJsonFile(trackFilePath);
+    
+    // Read the orders.json file
+    const ordersData = await readJsonFile(ordersFilePath);
+
+    // Create a flag to track if any order was updated
+    let ordersUpdated = false;
+
+    // Iterate through each order in track.json
+    trackData.forEach(trackEntry => {
+      if (areAllTrackingDetailsCompleted(trackEntry.trackingDetails)) {
+        // Find the corresponding order in orders.json
+        const order = ordersData.find(order => order.id === trackEntry.orderId);
+        if (order && order.status !== 'Completed') {
+          order.status = 'Completed';
+          ordersUpdated = true;
+        }
+        else{
+            order.status = 'Failed';
+            ordersUpdated = true;
+        }
+      }
+    });
+
+    // If any orders were updated, write back to orders.json
+    if (ordersUpdated) {
+      await writeJsonFile(ordersFilePath, ordersData);
+      console.log('Orders updated successfully.');
+    } else {
+      console.log('No orders needed updating.');
+    }
+  } catch (error) {
+    console.error('Error updating order status:', error);
   }
 };
 
@@ -277,12 +331,16 @@ app.post('/status', async (req, res) => {
   res.status(404).json({ message: 'This endpoint is not accessible directly. Please use the /place-order endpoint.' });
 });
 
-// Run the entire server initialization process every 10 seconds
+// Run the entire server initialization process every 15 seconds
 setInterval(initializeServer, 15000);
+
+// Run the updateOrderStatus function every 15 seconds
+setInterval(updateOrderStatus, 15000);
 
 app.listen(4000, () => {
   console.log('Server is running on port 4000');
 });
+
 
 
 
