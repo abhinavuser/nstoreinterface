@@ -137,18 +137,25 @@ export default {
       this.updateNavbarOptions();
     },
     async updateDetails(updatedDetails) {
-      const storeIndex = this.stores.findIndex(store => store.name === this.selectedOption);
-      const partnerIndex = this.partners.findIndex(partner => partner.name === this.selectedOption);
+    const storeIndex = this.stores.findIndex(store => store.name === this.selectedOption);
+    const partnerIndex = this.partners.findIndex(partner => partner.name === this.selectedOption);
 
-      if (storeIndex !== -1) {
-        this.stores[storeIndex] = { ...updatedDetails };
-      } else if (partnerIndex !== -1) {
-        this.partners[partnerIndex] = { ...updatedDetails };
+    if (storeIndex !== -1) {
+      if (updatedDetails.name !== this.stores[storeIndex].name) {
+        this.selectedOption = updatedDetails.name;
       }
+      this.stores[storeIndex] = { ...updatedDetails };
+    } else if (partnerIndex !== -1) {
+      if (updatedDetails.name !== this.partners[partnerIndex].name) {
+        this.selectedOption = updatedDetails.name;
+      }
+      this.partners[partnerIndex] = { ...updatedDetails };
+    }
 
-      await this.saveEntries();
-      this.updateNavbarOptions();
-    },
+    await this.saveEntries();
+    this.updateNavbarOptions();
+    this.selectedOptionDetails = updatedDetails; 
+  },
     async saveEntries() {
       try {
         const updatedData = {

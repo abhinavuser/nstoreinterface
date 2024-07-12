@@ -42,6 +42,15 @@ export default {
       editStoreDetails: { ...this.details },
     };
   },
+  watch: {
+    details: {
+      handler(newDetails) {
+        this.editStoreDetails = { ...newDetails };
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
   computed: {
     storeTitle() {
       return this.details ? this.details.name : 'Store Page';

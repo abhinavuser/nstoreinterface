@@ -50,6 +50,15 @@ export default {
       editPartnerDetails: { ...this.details },
     };
   },
+  watch: {
+    details: {
+      handler(newDetails) {
+        this.editPartnerDetails = { ...newDetails };
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
   computed: {
     partnerDetails() {
       return this.details;
