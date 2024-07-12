@@ -6,11 +6,11 @@
     },
     {
       "name": "Store 2",
-      "hasDeliveryPartner": false
+      "hasDeliveryPartner": true
     },
     {
       "name": "Store 3",
-      "hasDeliveryPartner": true
+      "hasDeliveryPartner": false
     }
   ],
   "partners": [
@@ -22,7 +22,7 @@
     {
       "name": "Dunzo",
       "location": "Location 2",
-      "amount": "1500"
+      "amount": "1400"
     },
     {
       "name": "Shadowfax",
