@@ -80,6 +80,36 @@
       },
       {
         "text": "Arrived",
+        "completed": false
+      },
+      {
+        "text": "Delivered",
+        "completed": false
+      }
+    ],
+    "orderUrl": "https://example.com/orders/3"
+  },
+  {
+    "orderId": 5,
+    "trackingDetails": [
+      {
+        "text": "Created",
+        "completed": true
+      },
+      {
+        "text": "Assigned",
+        "completed": true
+      },
+      {
+        "text": "Arrived at pickup",
+        "completed": true
+      },
+      {
+        "text": "Picked up",
+        "completed": true
+      },
+      {
+        "text": "Arrived",
         "completed": true
       },
       {
@@ -90,7 +120,67 @@
     "orderUrl": "https://example.com/orders/3"
   },
   {
-    "orderId": 5,
+    "orderId": 6,
+    "trackingDetails": [
+      {
+        "text": "Created",
+        "completed": true
+      },
+      {
+        "text": "Assigned",
+        "completed": true
+      },
+      {
+        "text": "Arrived at pickup",
+        "completed": true
+      },
+      {
+        "text": "Picked up",
+        "completed": true
+      },
+      {
+        "text": "Arrived",
+        "completed": false
+      },
+      {
+        "text": "Delivered",
+        "completed": false
+      }
+    ],
+    "orderUrl": "https://example.com/orders/3"
+  },
+  {
+    "orderId": 7,
+    "trackingDetails": [
+      {
+        "text": "Created",
+        "completed": true
+      },
+      {
+        "text": "Assigned",
+        "completed": true
+      },
+      {
+        "text": "Arrived at pickup",
+        "completed": false
+      },
+      {
+        "text": "Picked up",
+        "completed": false
+      },
+      {
+        "text": "Arrived",
+        "completed": false
+      },
+      {
+        "text": "Delivered",
+        "completed": false
+      }
+    ],
+    "orderUrl": "https://example.com/orders/3"
+  },
+  {
+    "orderId": 8,
     "trackingDetails": [
       {
         "text": "Created",

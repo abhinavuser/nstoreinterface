@@ -173,7 +173,7 @@ const appendToTrack = async (orderId, deliveryUrl) => {
 
     // Append new order to trackData if it's not a duplicate
     for (const order of ordersData) {
-      const response = await axios.get('http://localhost:3000/mockStatus');
+      const response = await axios.get('http://localhost:5000/mockStatus');
       const webhookTrackingDetails = response.data;
       if (!isDuplicateOrder(orderId)) {
         trackData.push({
@@ -374,61 +374,88 @@ const readJsonFile = (filePath) => {
   });
 };
 
+// Function to write JSON file
+const writeJsonFile = (filePath, data) => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+
 const ordersFilePath = path.join(__dirname, '../src/info/orders.json');
-const dataFilePath = path.join(__dirname, '../src/info/data.json');
+const dataFilePath = path.join(__dirname, '../src/info/data.json'); // Path to data.json
+const trackFilePath = path.join(__dirname, '../src/info/track.json'); // Path to track.json
 
-// Variables to store extracted data
-let extractedOrderData = null;
-let deliveryPartners = [];
+// Variable to store extracted data
+let extractedData = null;
 
-// Function to extract order data from orders.json
-const extractOrderData = async () => {
+// Variable to store delivery partners from data.json
+let dataJsonDeliveryPartners = [];
+
+// Array to store order IDs from orders.json
+let orderIDs = [];
+
+// Function to extract data from orders.json and update orderIDs
+const extractData = async () => {
   try {
     const jsonData = await readJsonFile(ordersFilePath);
+    orderIDs = jsonData.map(order => order.id); // Update orderIDs with all order IDs
     const lastData = jsonData[jsonData.length - 1];
 
-    extractedOrderData = {
+    extractedData = {
       id: lastData.id,
       customer: lastData.customer,
-      address: lastData.store,
-      contact: lastData.status,
+      store: lastData.store,
+      amount: lastData.amount,
+      status: lastData.status,
+      orderUrl: lastData.orderUrl,
+      quoteUrl: '', // Placeholder for quoteUrl, update if available
+      statusUrl: lastData.statusUrl,
       pickup: lastData.pickup,
-      drop: lastData.drop,
-      order: lastData.orderUrl,
-      status: lastData.statusUrl
+      drop: lastData.drop
     };
 
-    console.log('Extracted Order Data:', extractedOrderData);
+    console.log('Extracted Data:', extractedData);
+    console.log('Updated Order IDs:', orderIDs);
   } catch (error) {
-    console.error('Error reading or parsing orders.json file:', error);
+    console.error('Error reading or parsing JSON file:', error);
   }
 };
 
-// Function to extract delivery partners from data.json
-const extractDeliveryPartners = async () => {
+// Function to read delivery partners from data.json
+const extractDataJsonDeliveryPartners = async () => {
   try {
     const data = await readJsonFile(dataFilePath);
-    const partners = data.partners.map(partner => ({
-      name: partner.name,
-      endpoints: {
-        quoteUrl: partner.quoteUrl,
-        orderUrl: extractedOrderData ? extractedOrderData.order : null,
-        statusUrl: extractedOrderData ? extractedOrderData.status : null
-      }
-    }));
-
-    deliveryPartners = partners;
-    console.log('Delivery Partners updated from data.json:', deliveryPartners);
+    dataJsonDeliveryPartners = data.partners.map(partner => partner.name);
+    console.log('Delivery Partners from data.json:', dataJsonDeliveryPartners);
   } catch (error) {
     console.error('Error reading or parsing data.json file:', error);
   }
 };
 
+// Function to watch for changes in orders.json
+const watchOrdersJsonChanges = () => {
+  fs.watch(ordersFilePath, (event, filename) => {
+    if (filename) {
+      console.log(`Changes detected in ${filename}. Reloading order IDs...`);
+      extractData(); // Update orderIDs and extractedData
+    }
+  });
+};
+
+// Use Axios for actual API requests
+const postRequest = axios.post;
+
 // Function to place an order with the selected delivery partner
 async function placeOrder(orderUrl, customerData, orderId, pickupLocation, dropLocation) {
-  console.log(`Placing order with orderUrl: ${orderUrl}`);
   try {
-    const response = await axios.post(orderUrl, {
+    console.log(`Placing order with orderUrl: ${orderUrl}`);
+    const response = await postRequest(orderUrl, {
       pickupLocation,
       dropLocation,
       customerData,
@@ -437,146 +464,192 @@ async function placeOrder(orderUrl, customerData, orderId, pickupLocation, dropL
     console.log(`Order response: ${JSON.stringify(response.data)}`);
     return response.data;
   } catch (error) {
-    console.error('Error placing order:', error);
-    throw new Error('Failed to place order');
+    console.error(`Error placing order: ${error}`);
+    throw error;
   }
 }
 
 // Function to check order status
 async function checkOrderStatus(statusUrl, orderId) {
-  console.log(`Checking order status with statusUrl: ${statusUrl}`);
   try {
-    const response = await axios.post(statusUrl, { orderId });
+    console.log(`Checking order status with statusUrl: ${statusUrl}`);
+    const response = await postRequest(statusUrl, { orderId });
     console.log(`Status response: ${JSON.stringify(response.data)}`);
     return response.data;
   } catch (error) {
-    console.error('Error checking order status:', error);
-    throw new Error('Failed to check order status');
+    console.error(`Error checking order status: ${error}`);
+    throw error;
   }
 }
 
-// Utility function to delay execution
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+// Function to append order ID and delivery URL to track.json
+const appendToTrack = async (orderId, deliveryUrl) => {
+  try {
+    // Read existing track.json content
+    let trackData = [];
+    if (fs.existsSync(trackFilePath)) {
+      const trackJson = await readJsonFile(trackFilePath);
+      trackData = trackJson;
+    }
 
-// Function to get quotes from all delivery partners
-async function getQuotes(pickupLocation, dropLocation) {
-  const quoteRequests = deliveryPartners.map(async partner => {
-    try {
-      const response = await axios.get(partner.endpoints.quoteUrl, {
-        params: {
-          pickupLocation,
-          dropLocation
-        }
+    // Check if the orderId already exists in trackData
+    const isDuplicateOrder = (orderId) => {
+      return trackData.some(entry => entry.orderId === orderId);
+    };
+
+    if (!isDuplicateOrder(orderId)) {
+      // Append new order to trackData
+      trackData.push({
+        orderId,
+        deliveryUrl
       });
-      return {
+
+      // Write updated trackData back to track.json
+      await writeJsonFile(trackFilePath, trackData);
+      console.log(`Appended order ${orderId} to track.json with delivery URL: ${deliveryUrl}`);
+    } else {
+      console.log(`Order ${orderId} already exists in track.json. Skipping.`);
+    }
+
+    console.log('Finished appending orders to track.json');
+  } catch (error) {
+    console.error('Error appending to track.json:', error);
+  }
+};
+
+// Function to check if all tracking details are completed
+const areAllTrackingDetailsCompleted = (trackingDetails) => {
+  return trackingDetails.every(detail => detail.completed);
+};
+
+// Function to update order status to "Completed"
+const updateOrderStatus = async () => {
+  try {
+    // Read the track.json file
+    const trackData = await readJsonFile(trackFilePath);
+    
+    // Read the orders.json file
+    const ordersData = await readJsonFile(ordersFilePath);
+
+    // Create a flag to track if any order was updated
+    let ordersUpdated = false;
+
+    // Iterate through each order in track.json
+    trackData.forEach(trackEntry => {
+      if (areAllTrackingDetailsCompleted(trackEntry.trackingDetails)) {
+        // Find the corresponding order in orders.json
+        const order = ordersData.find(order => order.id === trackEntry.orderId);
+        if (order && order.status !== 'Completed') {
+          order.status = 'Completed';
+          ordersUpdated = true;
+        } else {
+          order.status = 'Failed';
+          ordersUpdated = true;
+        }
+      }
+    });
+
+    // If any orders were updated, write back to orders.json
+    if (ordersUpdated) {
+      await writeJsonFile(ordersFilePath, ordersData);
+      console.log('Orders updated successfully.');
+    } else {
+      console.log('No orders needed updating.');
+    }
+  } catch (error) {
+    console.error('Error updating order status:', error);
+  }
+};
+
+// Delivery partners configuration
+let deliveryPartners = [];
+
+// Function to initialize the server
+const initializeServer = async () => {
+  await extractData();
+  await extractDataJsonDeliveryPartners();
+  watchOrdersJsonChanges(); // Start watching orders.json for changes
+
+  if (extractedData && dataJsonDeliveryPartners.length > 0) {
+    deliveryPartners = dataJsonDeliveryPartners.map(partnerName => ({
+      name: partnerName,
+      endpoints: {
+        quoteUrl: Math.floor(Math.random() * 200), // Random quote for demonstration
+        orderUrl: extractedData.orderUrl,
+        statusUrl: extractedData.statusUrl
+      }
+    }));
+
+    // Utility function to delay execution
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Function to get quotes from all delivery partners
+    async function getQuotes(pickupLocation, dropLocation) {
+      const quotes = deliveryPartners.map(partner => ({
         partner: partner.name,
-        quote: response.data.quote,
+        quote: partner.endpoints.quoteUrl,
         orderUrl: partner.endpoints.orderUrl,
         statusUrl: partner.endpoints.statusUrl
-      };
-    } catch (error) {
-      console.error(`Error getting quote from ${partner.name}:`, error);
-      return null;
+      }));
+      return quotes;
     }
-  });
 
-  const quotes = await Promise.all(quoteRequests);
-  return quotes.filter(quote => quote !== null); // Remove failed requests
-}
+    // Place order and check status automatically once
+    try {
+      console.log('Automatically placing order...');
+      const { id: orderId, pickup, drop } = extractedData;
+      const customerData = extractedData;
 
-// API endpoint to process order
-app.post('/place-order', async (req, res) => {
-  const { id: orderId, pickup, drop } = extractedOrderData;
-  const customerData = extractedOrderData;
-
-  let bestQuote, deliveryUrl;
-
-  try {
-    while (true) {
+      // Get quotes
       console.log('Sending requests to delivery partners for quotes...');
       const quotes = await getQuotes(pickup, drop);
 
-      console.log('Waiting for 3 minutes...');
-      await delay(3 * 60 * 1000); // Wait for 3 minutes
-
-      console.log('Checking quotes...');
-      bestQuote = quotes.reduce((prev, current) => (prev.quote < current.quote ? prev : current));
-
+      // Select best quote
+      const bestQuote = quotes.reduce((prev, current) => (prev.quote < current.quote ? prev : current));
       console.log(`Best quote from: ${bestQuote.partner} - $${bestQuote.quote}`);
 
+      // Place order
       console.log('Placing order with the best quote...');
       const orderResponse = await placeOrder(bestQuote.orderUrl, customerData, orderId, pickup, drop);
 
       if (orderResponse.success) {
-        deliveryUrl = orderResponse.deliveryUrl;
+        const deliveryUrl = orderResponse.deliveryUrl;
+
+        // Wait for 3 seconds
+        await delay(3000);
 
         // Check order status
-        let statusResponse = await checkOrderStatus(bestQuote.statusUrl, orderId);
+        console.log('Checking order status after 3 seconds...');
+        const statusResponse = await checkOrderStatus(bestQuote.statusUrl, orderId);
 
         if (statusResponse.status === 'delivered') {
-          console.log('Order request delivered to partner successfully.');
-          res.json({ message: 'Order request delivered to partner successfully', deliveryUrl });
-          break;
-        } else if (statusResponse.status === 'cancelled') {
-          console.log('Order cancelled by delivery partner, retrying...');
-          continue;
+          console.log('Order request delivered successfully.');
+        } else {
+          console.log(`Order status: ${statusResponse.status}`);
         }
+
+        // Append to track.json
+        await appendToTrack(orderId, deliveryUrl);
+
+        // Update order status to "Completed" in orders.json
+        await updateOrderStatus();
       } else {
-        throw new Error('Failed to place order with the selected partner');
+        console.log('Order request failed.');
       }
+    } catch (error) {
+      console.error('Error in automatic order placement and status check:', error);
     }
-  } catch (error) {
-    console.error('Error processing order:', error);
-    res.status(500).json({ error: 'Failed to place order' });
   }
-});
-
-// API endpoint to check order status
-app.post('/status', async (req, res) => {
-  const { orderId, partner } = req.body;
-
-  if (!deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase())) {
-    return res.status(400).json({ message: 'Invalid delivery partner' });
-  }
-
-  try {
-    const partnerData = deliveryPartners.find(p => p.name.toLowerCase() === partner.toLowerCase());
-    const response = await checkOrderStatus(partnerData.endpoints.statusUrl, orderId);
-    res.json({ message: 'Status fetched successfully', status: response });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching status', error: error.message });
-  }
-});
-
-// Function to watch for changes in orders.json and data.json
-const watchFilesForChanges = () => {
-  fs.watch(ordersFilePath, (event, filename) => {
-    if (filename) {
-      console.log(`Changes detected in ${filename}. Reloading order data...`);
-      extractOrderData();
-    }
-  });
-
-  fs.watch(dataFilePath, (event, filename) => {
-    if (filename) {
-      console.log(`Changes detected in ${filename}. Reloading delivery partners...`);
-      extractDeliveryPartners();
-    }
-  });
 };
 
-// Function to initialize server and start watching files
-const initializeServer = async () => {
-  await extractOrderData();
-  await extractDeliveryPartners();
-  watchFilesForChanges(); // Start watching files for changes
-
-  app.listen(4000, () => {
-    console.log('Server is running on port 4000');
-  });
-};
-
+// Initialize the server
 initializeServer();
+
+// Start the Express server
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
 
 
 */
