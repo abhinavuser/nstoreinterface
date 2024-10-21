@@ -77,6 +77,7 @@ export default {
       this.selectedOption = option;
       this.selectedOptionDetails = null;
       this.closeAllDropdowns();
+      //this.$router.push({ path: `/${option.toLowerCase()}` }); 
     },
     toggleDropdown(option) {
       this.closeAllDropdowns();
@@ -214,6 +215,7 @@ export default {
 nav.navbar-dark {
   background-color: #333;
   padding: 10px 20px;
+  margin-top: 0;
 }
 
 nav.navbar-light {

@@ -1,185 +1,192 @@
 <template>
   <div class="app">
-    <nav :class="`navbar theme-${theme}`">
-      <div class="navbar-container">
-        <a class="navbar-brand" href="#">nStore</a>
-        <div class="navbar-links">
-          <ul class="navbar-nav">
-            <li v-for="(page, index) in pages" class="nav-item" :key="index">
-              <a
-                class="nav-link"
-                :class="{ active: activePage == index }"
-                aria-current="page"
-                href="#"
-                @click.prevent="activePage = index"
-              >{{ page.link.text }}</a>
-            </li>
-          </ul>
+    <header class="hero">
+      <h1>Welcome to Our Automatic Customizable Order Management System</h1>
+      <p>Optimize your order management with ease and efficiency.</p>
+      <button class="btn hero-btn">Get Started</button>
+    </header>
+
+    <section class="features">
+      <h2>Features</h2>
+      <div class="feature-cards">
+        <div class="feature-card">
+          <h3>Customizable</h3>
+          <p>Adapt the system to fit your unique business needs.</p>
         </div>
-        <button class="btn theme-toggle" @click.prevent="changeTheme">Change theme</button>
-        <button class="navbar-toggler" @click="toggleNav">☰</button>
+        <div class="feature-card">
+          <h3>Automated</h3>
+          <p>Automate your processes to save time and reduce errors.</p>
+        </div>
+        <div class="feature-card">
+          <h3>User-Friendly</h3>
+          <p>Enjoy an intuitive interface that enhances productivity.</p>
+        </div>
       </div>
-    </nav>
-    <div id="content" class="content">
-      <h1>{{ pages[activePage].pageTitle }}</h1>
-      <p>{{ pages[activePage].content }}</p>
-    </div>
+    </section>
+
+    <section class="testimonials">
+      <h2>What Our Users Say</h2>
+      <div class="testimonial-cards">
+        <div class="testimonial-card">
+          <p>"This system has transformed our business! Highly recommend!"</p>
+          <span>- Alex J.</span>
+        </div>
+        <div class="testimonial-card">
+          <p>"Incredibly easy to use and incredibly effective!"</p>
+          <span>- Sarah T.</span>
+        </div>
+        <div class="testimonial-card">
+          <p>"A must-have tool for any business looking to improve efficiency."</p>
+          <span>- James K.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Ready to Transform Your Order Management?</h2>
+      <button class="btn cta-btn">Sign Up Now</button>
+    </section>
+
+    <footer class="footer">
+      <p>&copy; 2024 nStore. All Rights Reserved.</p>
+    </footer>
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {
-      activePage: 0,
-      theme: 'light',
-      navOpen: false,
-      pages: [
-        {
-          link: { text: 'Home', url: 'index.html' },
-          pageTitle: 'Home Page',
-          content: 'This is the home content'
-        },
-        {
-          link: { text: 'About', url: 'about.html' },
-          pageTitle: 'About Page',
-          content: 'This is the about content'
-        },
-        {
-          link: { text: 'Contact', url: 'contact.html' },
-          pageTitle: 'Contact Page',
-          content: 'This is the contact content'
-        }
-      ]
-    };
-  },
-  methods: {
-    changeTheme() {
-      this.theme = this.theme === 'light' ? 'dark' : 'light';
-    },
-    toggleNav() {
-      this.navOpen = !this.navOpen;
-    }
+    return {};
   }
 };
 </script>
 
 <style scoped>
 .app {
-  height: 100vh;
-  font-family: Arial, sans-serif;
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: var(--navbar-bg);
-}
-
-.navbar-container {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.navbar-links {
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-}
-
-.navbar-toggler {
-  display: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.navbar-collapse {
-  display: flex;
-  align-items: center;
-}
-
-.navbar-collapse.open {
-  display: block;
-}
-
-.navbar-nav {
-  display: flex;
-  list-style: none;
-  padding: 0;
+  font-family: 'Arial', sans-serif;
   margin: 0;
+  padding: 0;
 }
 
-.nav-item {
-  margin-left: 1rem;
+.hero {
+  text-align: center;
+  padding: 100px 20px;
+  background: #3498db;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.nav-link {
-  text-decoration: none;
-  padding: 10px 15px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  color: var(--link-color);
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
 }
 
-.nav-link.active {
-  font-weight: bold;
-  color: var(--link-active-color);
+p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
 }
 
-.theme-light {
-  --navbar-bg: #f8f9fa;
-  --link-color: #333(0, 0, 0, 0.5);
-  --link-active-color: #333(0, 0, 0, 0.9);
-}
-
-.theme-dark {
-  --navbar-bg: #333;
-  --link-color: rgba(255, 255, 255, 0.5);
-  --link-active-color: rgba(255, 255, 255, 0.9);
-}
-
-.navbar-brand {
-  color: var(--link-active-color);
-  font-weight: bold;
-  background-image: linear-gradient(to top, lightblue 0%, #3498db 100%);
-  background-size: 100%;
-  -webkit-background-clip: text;
-  -moz-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -moz-text-fill-color: transparent;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 1.5rem;
-}
 
 .btn {
-  padding: 0.5rem 1rem;
-  margin-left: 1rem;
-  cursor: pointer;
+  padding: 12px 24px;
+  font-size: 1rem;
   border: none;
-  background-color: #3498db;
+  background-color: #333;
   color: white;
-  border-radius: 4px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
 .btn:hover {
-  background-color: #2980b9;
+  background-color: black;
+  transform: scale(1.05);
 }
 
-.theme-light .btn {
-  color: white;
+.features {
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  height: 80vh;
 }
 
-.theme-dark .btn {
-  color: white;
-}
-
-.content {
+.features h2 {
   text-align: center;
-  padding: 2rem;
+  margin-bottom: 40px;
+  font-size: 2rem;
 }
 
+.feature-cards {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+}
+
+.testimonials {
+  padding: 60px 20px;
+  background-color: #ffffff;
+  height: 60vh;
+}
+
+.testimonials h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2rem;
+}
+
+.testimonial-cards {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.testimonial-card {
+  background: #e9ecef;
+  border-radius: 12px;
+  padding: 30px;
+  width: 300px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.testimonial-card:hover {
+  transform: scale(1.05);
+}
+
+.cta {
+  text-align: center;
+  padding: 60px 20px;
+  background: #3498db;
+  color: white;
+}
+
+.cta h2 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.cta-btn {
+  margin-top: 20px;
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  color: #333;
+}
 </style>
